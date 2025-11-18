@@ -28,6 +28,72 @@ const App = () => {
 
   const mountRef = useRef<HTMLDivElement>(null);
 
+  // Apply preset configurations
+  useEffect(() => {
+    switch (preset) {
+      case "isometric":
+        setShape("cube");
+        setTwist(0);
+        setRoundness(0.1);
+        setFatten(1);
+        setAngle("isometric-left");
+        setMainColor("#4A90E2");
+        setShadowTint("#2C3E50");
+        setShadowIntensity(0.6);
+        break;
+      case "clay":
+        setShape("sphere");
+        setTwist(0);
+        setRoundness(0.8);
+        setFatten(1.1);
+        setAngle("isometric-right");
+        setMainColor("#E67E22");
+        setShadowTint("#D35400");
+        setShadowIntensity(0.4);
+        break;
+      case "extrude":
+        setShape("cylinder");
+        setTwist(0);
+        setRoundness(0);
+        setFatten(1);
+        setAngle("isometric-left");
+        setMainColor("#9B59B6");
+        setShadowTint("#8E44AD");
+        setShadowIntensity(0.7);
+        break;
+      case "low-poly":
+        setShape("cone");
+        setTwist(0);
+        setRoundness(0);
+        setFatten(1);
+        setAngle("isometric-right");
+        setMainColor("#2ECC71");
+        setShadowTint("#27AE60");
+        setShadowIntensity(0.5);
+        break;
+      case "organic":
+        setShape("sphere");
+        setTwist(15);
+        setRoundness(0.9);
+        setFatten(1.15);
+        setAngle("isometric-left");
+        setMainColor("#E91E63");
+        setShadowTint("#C2185B");
+        setShadowIntensity(0.45);
+        break;
+      case "emoji":
+        setShape("sphere");
+        setTwist(0);
+        setRoundness(1);
+        setFatten(1.05);
+        setAngle("top-down");
+        setMainColor("#FFD700");
+        setShadowTint("#FFA500");
+        setShadowIntensity(0.3);
+        break;
+    }
+  }, [preset]);
+
   useEffect(() => {
     if (!mountRef.current) return;
 
