@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as THREE from "three";
-import { SVGRenderer } from "three/examples/jsm/renderers/SVGRenderer.js";
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { Rows, Text, Select, Button, ColorSelector, Box, Slider } from "@canva/app-ui-kit";
 import { addElementAtPoint } from "@canva/design";
@@ -34,8 +33,7 @@ const App = () => {
 
     // --- Scene Setup ---
     const scene = new THREE.Scene();
-    // Remove background for transparency
-    scene.background = null;
+    // No background for transparency
 
     const width = 328;
     const height = 328;
@@ -120,10 +118,14 @@ const App = () => {
     positionAttribute.needsUpdate = true;
     mesh.geometry.computeVertexNormals(); // Important for lighting after deformation
 
-    // --- SVG Renderer ---
-    const renderer = new SVGRenderer();
+    // --- WebGL Renderer with transparent background ---
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: true, 
+      alpha: true,
+      preserveDrawingBuffer: true 
+    });
     renderer.setSize(width, height);
-    renderer.setQuality('high');
+    renderer.setClearColor(0x000000, 0); // Transparent background
     renderer.render(scene, camera);
     
     // Clear previous render and append new one
@@ -132,53 +134,34 @@ const App = () => {
         mountRef.current.appendChild(renderer.domElement);
     }
 
+    // Cleanup
+    return () => {
+      renderer.dispose();
+      geometry.dispose();
+      material.dispose();
+    };
+
   }, [shape, twist, roundness, fatten, angle, mainColor, shadowTint, shadowIntensity, preset]);
 
   const exportToSvg = async () => {
     if (mountRef.current) {
-      const svgElement = mountRef.current.querySelector('svg');
-      if (svgElement) {
-        // Get the SVG string
-        const svgString = new XMLSerializer().serializeToString(svgElement);
+      const canvas = mountRef.current.querySelector('canvas');
+      if (canvas) {
+        // Get the PNG data URL directly from the canvas
+        const pngDataUrl = canvas.toDataURL('image/png');
         
-        // Create an image from the SVG
-        const img = new Image();
-        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-        const url = URL.createObjectURL(svgBlob);
-        
-        img.onload = async () => {
-          // Create a canvas and draw the image on it
-          const canvas = document.createElement('canvas');
-          canvas.width = 328;
-          canvas.height = 328;
-          const ctx = canvas.getContext('2d');
-          
-          if (ctx) {
-            // Draw the SVG image (no background for transparency)
-            ctx.drawImage(img, 0, 0, 328, 328);
-            
-            // Convert canvas to PNG data URL
-            const pngDataUrl = canvas.toDataURL('image/png');
-            
-            // Add the PNG image to Canva
-            await addElementAtPoint({
-              type: "image",
-              dataUrl: pngDataUrl,
-              altText: {
-                text: "3D generated object",
-              },
-              top: 0,
-              left: 0,
-              width: 328,
-              height: 328,
-            });
-          }
-          
-          // Clean up
-          URL.revokeObjectURL(url);
-        };
-        
-        img.src = url;
+        // Add the PNG image to Canva
+        await addElementAtPoint({
+          type: "image",
+          dataUrl: pngDataUrl,
+          altText: {
+            text: "3D generated object",
+          },
+          top: 0,
+          left: 0,
+          width: 328,
+          height: 328,
+        });
       }
     }
   };
