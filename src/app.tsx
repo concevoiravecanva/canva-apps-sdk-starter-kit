@@ -147,20 +147,16 @@ const App = () => {
     if (mountRef.current) {
       const canvas = mountRef.current.querySelector('canvas');
       if (canvas) {
-        // Get the PNG data URL directly from the canvas
-        const pngDataUrl = canvas.toDataURL('image/png');
+        // Export directly as PNG with transparency (most reliable method)
+        const dataUrl = canvas.toDataURL('image/png');
         
-        // Add the PNG image to Canva
         await addElementAtPoint({
-          type: "image",
-          dataUrl: pngDataUrl,
-          altText: {
-            text: "3D generated object",
-          },
+          type: 'image',
+          dataUrl,
           top: 0,
           left: 0,
           width: 328,
-          height: 328,
+          height: 328
         });
       }
     }
