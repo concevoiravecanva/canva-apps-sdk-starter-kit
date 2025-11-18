@@ -204,6 +204,19 @@ const App = () => {
           />
         </Rows>
 
+        <Rows spacing="1.5u">
+          <Text size="small" tone="tertiary">Camera Angle</Text>
+          <Select
+            value={angle}
+            options={[
+              { value: "isometric-left", label: "Isometric Left" },
+              { value: "isometric-right", label: "Isometric Right" },
+              { value: "top-down", label: "Slightly Top-Down" },
+            ]}
+            onChange={setAngle}
+          />
+        </Rows>
+
         <Rows spacing="1u">
           <Text size="small" tone="tertiary">Deformations</Text>
           
@@ -241,48 +254,46 @@ const App = () => {
           </Box>
         </Rows>
 
-        <Rows spacing="1.5u">
-          <Text size="small" tone="tertiary">Camera Angle</Text>
-          <Select
-            value={angle}
-            options={[
-              { value: "isometric-left", label: "Isometric Left" },
-              { value: "isometric-right", label: "Isometric Right" },
-              { value: "top-down", label: "Slightly Top-Down" },
-            ]}
-            onChange={setAngle}
-          />
-        </Rows>
-
         <Rows spacing="1u">
           <Text size="small" tone="tertiary">Colors</Text>
           
-          <Box>
-            <Text size="xsmall">Main Color</Text>
-            <ColorSelector
-              color={mainColor}
-              onChange={setMainColor}
-            />
-          </Box>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+            <div style={{ flex: 1 }}>
+              <Box>
+                <Text size="xsmall">Main Color</Text>
+                <ColorSelector
+                  color={mainColor}
+                  onChange={setMainColor}
+                />
+              </Box>
+            </div>
 
-          <Box>
-            <Text size="xsmall">Shadow Tint</Text>
-            <ColorSelector
-              color={shadowTint}
-              onChange={setShadowTint}
-            />
-          </Box>
+            <div style={{ flex: 1 }}>
+              <Box>
+                <Text size="xsmall">Shadow Tint</Text>
+                <ColorSelector
+                  color={shadowTint}
+                  onChange={setShadowTint}
+                />
+              </Box>
+            </div>
 
-          <Box>
-            <Text size="xsmall">Shadow Intensity: {shadowIntensity.toFixed(2)}</Text>
-            <Slider
-              min={0}
-              max={1}
-              step={0.01}
-              value={shadowIntensity}
-              onChange={setShadowIntensity}
-            />
-          </Box>
+            <div style={{ flex: 1 }}>
+              <Box>
+                <Text size="xsmall">Shadow Intensity</Text>
+                <div style={{ paddingTop: '4px' }}>
+                  <Text size="xsmall">{shadowIntensity.toFixed(2)}</Text>
+                  <Slider
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={shadowIntensity}
+                    onChange={setShadowIntensity}
+                  />
+                </div>
+              </Box>
+            </div>
+          </div>
         </Rows>
       </Rows>
     </div>
