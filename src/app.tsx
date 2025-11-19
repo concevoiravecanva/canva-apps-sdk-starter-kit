@@ -105,12 +105,25 @@ const App = () => {
 
     // --- Camera ---
     switch (angle) {
-      case "isometric-left": camera.position.set(-5, 5, 5); break;
-      case "isometric-right": camera.position.set(5, 5, 5); break;
-      case "top-down": camera.position.set(0, 7, 2); break;
-      default: camera.position.set(-5, 5, 5);
+      case "isometric-left":
+        camera.position.set(-3, 2, 3);
+        break;
+      case "isometric-right":
+        camera.position.set(3, 2, 3);
+        break;
+      case "front":
+        camera.position.set(0, 0, 4);
+        break;
+      case "top":
+        camera.position.set(0, 4, 0.01); // a little bit off to avoid gimbal lock
+        break;
+      case "side":
+        camera.position.set(4, 0, 0);
+        break;
+      default:
+        camera.position.set(-3, 2, 3);
     }
-    camera.lookAt(scene.position);
+    camera.lookAt(0, 0, 0);
 
     // --- Lighting ---
     const ambientLight = new THREE.AmbientLight(0xffffff, ambientIntensity);
@@ -430,7 +443,9 @@ const App = () => {
                 options={[
                   { value: "isometric-left", label: intl.formatMessage({ defaultMessage: "Isometric Left", description: "Isometric Left camera angle" }) },
                   { value: "isometric-right", label: intl.formatMessage({ defaultMessage: "Isometric Right", description: "Isometric Right camera angle" }) },
-                  { value: "top-down", label: intl.formatMessage({ defaultMessage: "Slightly Top-Down", description: "Slightly Top-Down camera angle" }) },
+                  { value: "front", label: intl.formatMessage({ defaultMessage: "Front", description: "Front camera angle" }) },
+                  { value: "top", label: intl.formatMessage({ defaultMessage: "Top", description: "Top camera angle" }) },
+                  { value: "side", label: intl.formatMessage({ defaultMessage: "Side", description: "Side camera angle" }) },
                 ]}
                 onChange={setAngle}
               />
