@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from 'three-stdlib';
-import { Rows, Text, Select, Button, ColorSelector, Box, Slider, Columns, Column, Accordion, AccordionItem } from "@canva/app-ui-kit";
+import { Rows, Text, Select, Button, ColorSelector, Box, Slider, Columns, Column, Accordion, AccordionItem, Checkbox } from "@canva/app-ui-kit";
 import { addElementAtPoint } from "@canva/design";
 import { useIntl } from "react-intl";
 import "styles/components.css";
@@ -27,6 +27,9 @@ const defaultState = {
   donutTube: 0.4,
   knotP: 2,
   knotQ: 3,
+  isTransparent: true,
+  backgroundColor: "#FFFFFF",
+  wireframeOverlay: false,
 };
 
 const App = () => {
@@ -46,6 +49,9 @@ const App = () => {
   const [donutTube, setDonutTube] = useState(defaultState.donutTube);
   const [knotP, setKnotP] = useState(defaultState.knotP);
   const [knotQ, setKnotQ] = useState(defaultState.knotQ);
+  const [isTransparent, setIsTransparent] = useState(defaultState.isTransparent);
+  const [backgroundColor, setBackgroundColor] = useState(defaultState.backgroundColor);
+  const [wireframeOverlay, setWireframeOverlay] = useState(defaultState.wireframeOverlay);
 
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -123,31 +129,16 @@ const App = () => {
       }
       scene.remove(object);
     }
-
-    // --- Camera ---
-    switch (angle) {
-      case "isometric-left":
-        camera.position.set(-3, 2, 3);
-        break;
-      case "isometric-right":
-        camera.position.set(3, 2, 3);
-        break;
-      case "front":
-        camera.position.set(0, 0, 4);
-        break;
-      case "top":
-        camera.position.set(0, 4, 0.01); // a little bit off to avoid gimbal lock
-        break;
-      case "side":
-        camera.position.set(4, 0, 0);
-        break;
-      default:
-        camera.position.set(-3, 2, 3);
+    
+    if (isTransparent) {
+        renderer.setClearAlpha(0);
+    } else {
+        renderer.setClearColor(backgroundColor);
+        renderer.setClearAlpha(1);
     }
-    camera.lookAt(0, 0, 0);
 
-    // --- Lighting ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, ambientIntensity);
+    // --- Lights ---
+    const ambientLight = new THREE.AmbientLight(lightColor, ambientIntensity);
     scene.add(ambientLight);
     const directionalLight = new THREE.DirectionalLight(new THREE.Color(lightColor), shadowIntensity);
     directionalLight.position.set(5, 10, 7.5);
@@ -275,8 +266,41 @@ const App = () => {
       createMesh(geometry);
     }
 
+    if (wireframeOverlay) {
+        const wireframeMaterial = new THREE.MeshBasicMaterial({
+            color: 0x000000,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.5,
+        });
+        const wireframeMesh = new THREE.Mesh(geometry, wireframeMaterial);
+        scene.add(wireframeMesh);
+    }
+
+    // --- Camera ---
+    switch (angle) {
+      case "isometric-left":
+        camera.position.set(-3, 2, 3);
+        break;
+      case "isometric-right":
+        camera.position.set(3, 2, 3);
+        break;
+      case "front":
+        camera.position.set(0, 0, 4);
+        break;
+      case "top":
+        camera.position.set(0, 4, 0.01); // a little bit off to avoid gimbal lock
+        break;
+      case "side":
+        camera.position.set(4, 0, 0);
+        break;
+      default:
+        camera.position.set(-3, 2, 3);
+    }
+    camera.lookAt(0, 0, 0);
+
     renderer.render(scene, camera);
-  }, [shape, twist, roundness, taper, noise, angle, mainColor, shadowTint, lightColor, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ]);
+  }, [shape, twist, roundness, taper, noise, angle, mainColor, shadowTint, lightColor, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent, backgroundColor, wireframeOverlay]);
 
   const addToCanva = () => {
     const renderer = rendererRef.current;
@@ -317,6 +341,9 @@ const App = () => {
     setDonutTube(defaultState.donutTube);
     setKnotP(defaultState.knotP);
     setKnotQ(defaultState.knotQ);
+    setIsTransparent(defaultState.isTransparent);
+    setBackgroundColor(defaultState.backgroundColor);
+    setWireframeOverlay(defaultState.wireframeOverlay);
   };
 
   return (
@@ -379,6 +406,11 @@ const App = () => {
                   onChange={(value) => setMaterialType(value as MaterialType)}
                 />
               </Rows>
+               <Checkbox
+                label={intl.formatMessage({ defaultMessage: "Wireframe Overlay", description: "Checkbox to toggle wireframe overlay" })}
+                checked={wireframeOverlay}
+                onChange={(_, checked) => setWireframeOverlay(checked)}
+              />
             </Rows>
           </AccordionItem>
 
@@ -515,6 +547,20 @@ const App = () => {
                   onChange={setAmbientIntensity}
                 />
               </Box>
+              <Checkbox
+                label={intl.formatMessage({ defaultMessage: "Transparent Background", description: "Checkbox to toggle transparent background" })}
+                checked={isTransparent}
+                onChange={(_, checked) => setIsTransparent(checked)}
+              />
+              {!isTransparent && (
+                <Rows spacing="0.5u">
+                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Background Color", description: "Label for the background color selector" })}</Text>
+                    <ColorSelector
+                        color={backgroundColor}
+                        onChange={setBackgroundColor}
+                    />
+                </Rows>
+              )}
             </Rows>
           </AccordionItem>
 
