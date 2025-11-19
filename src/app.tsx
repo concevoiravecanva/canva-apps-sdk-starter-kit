@@ -68,6 +68,7 @@ const App = () => {
   const [wireframeOverlay, setWireframeOverlay] = useState(defaultState.wireframeOverlay);
   const [exportSize, setExportSize] = useState(1024);
   const [showHelp, setShowHelp] = useState(false);
+  const [isSceneReady, setIsSceneReady] = useState(false);
 
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -112,6 +113,7 @@ const App = () => {
       if (sceneRef.current) {
         sceneRef.current.environment = texture;
       }
+      setIsSceneReady(true);
     });
 
     // --- Cleanup on unmount ---
@@ -317,7 +319,7 @@ const App = () => {
     camera.lookAt(0, 0, 0);
 
     renderer.render(scene, camera);
-  }, [shape, twist, roundness, taper, noise, rotationX, rotationY, rotationZ, mainColor, shadowTint, lightColor, lightX, lightY, lightZ, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent, backgroundColor, backgroundOpacity, wireframeOverlay]);
+  }, [shape, twist, roundness, taper, noise, rotationX, rotationY, rotationZ, mainColor, shadowTint, lightColor, lightX, lightY, lightZ, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent, backgroundColor, backgroundOpacity, wireframeOverlay, isSceneReady]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -443,8 +445,11 @@ const App = () => {
         
         <Columns spacing="1u">
             <Column>
-                <Button variant="primary" onClick={addToCanva} stretch>
-                    {intl.formatMessage({ defaultMessage: "Add to Canva", description: "Button to add the 3D element to the Canva design" })}
+                <Button variant="primary" onClick={addToCanva} stretch disabled={!isSceneReady} loading={!isSceneReady}>
+                    {isSceneReady
+                        ? intl.formatMessage({ defaultMessage: "Add to Canva", description: "Button to add the 3D element to the Canva design" })
+                        : intl.formatMessage({ defaultMessage: "Loading Scene...", description: "Loading state for the add to canva button" })
+                    }
                 </Button>
             </Column>
             <Column>
