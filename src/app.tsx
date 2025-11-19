@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
-import { Rows, Text, Select, Button, ColorSelector, Box, Slider } from "@canva/app-ui-kit";
+import { Rows, Text, Select, Button, ColorSelector, Box, Slider, Columns, Column } from "@canva/app-ui-kit";
 import { addElementAtPoint } from "@canva/design";
 import { useIntl } from "react-intl";
 import "styles/components.css";
@@ -207,7 +207,8 @@ const App = () => {
       dataUrl,
       width: 1312,
       height: 1312,
-      altText: { text: "", decorative: true },
+      top: 0,
+      left: 0,
     });
   };
 
@@ -217,6 +218,28 @@ const App = () => {
         <Box>
           <div ref={mountRef} className="renderPreview" />
         </Box>
+        
+        <Columns spacing="1u" align="center">
+            <Column>
+                <Rows spacing="0.5u">
+                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Main Color", description: "Label for the main color selector" })}</Text>
+                    <ColorSelector
+                        color={mainColor}
+                        onChange={setMainColor}
+                    />
+                </Rows>
+            </Column>
+            <Column>
+                <Rows spacing="0.5u">
+                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Shadow Tint", description: "Label for the shadow tint color selector" })}</Text>
+                    <ColorSelector
+                        color={shadowTint}
+                        onChange={setShadowTint}
+                    />
+                </Rows>
+            </Column>
+        </Columns>
+
         <Button variant="primary" onClick={addToCanva} stretch>
           {intl.formatMessage({ defaultMessage: "Add to Canva", description: "Button to add the 3D element to the Canva design" })}
         </Button>
@@ -288,24 +311,6 @@ const App = () => {
               />
             </Box>
           )}
-        </Rows>
-
-        <Rows spacing="1.5u">
-          <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Colors", description: "Section title for color controls" })}</Text>
-          <Box>
-            <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Main Color", description: "Label for the main color selector" })}</Text>
-            <ColorSelector
-              color={mainColor}
-              onChange={setMainColor}
-            />
-          </Box>
-          <Box>
-            <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Shadow Tint", description: "Label for the shadow tint color selector" })}</Text>
-            <ColorSelector
-              color={shadowTint}
-              onChange={setShadowTint}
-            />
-          </Box>
         </Rows>
 
         <Rows spacing="1.5u">
