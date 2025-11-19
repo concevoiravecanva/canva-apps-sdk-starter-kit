@@ -40,58 +40,66 @@ const defaultState = {
   wireframeOverlay: false,
 };
 
-const App = () => {
-  const intl = useIntl();
-  const [shape, setShape] = useState<Shape>(defaultState.shape);
-  const [twist, setTwist] = useState(defaultState.twist);
-  const [roundness, setRoundness] = useState(defaultState.roundness);
-  const [taper, setTaper] = useState(defaultState.taper);
-  const [noise, setNoise] = useState(defaultState.noise);
-  const [rotationX, setRotationX] = useState(defaultState.rotationX);
-  const [rotationY, setRotationY] = useState(defaultState.rotationY);
-  const [rotationZ, setRotationZ] = useState(defaultState.rotationZ);
-  const [mainColor, setMainColor] = useState(defaultState.mainColor);
-  const [shadowTint, setShadowTint] = useState(defaultState.shadowTint);
-  const [lightColor, setLightColor] = useState(defaultState.lightColor);
-  const [lightX, setLightX] = useState(defaultState.lightX);
-  const [lightY, setLightY] = useState(defaultState.lightY);
-  const [lightZ, setLightZ] = useState(defaultState.lightZ);
-  const [shadowIntensity, setShadowIntensity] = useState(defaultState.shadowIntensity);
-  const [ambientIntensity, setAmbientIntensity] = useState(defaultState.ambientIntensity);
-  const [materialType, setMaterialType] = useState<MaterialType>(defaultState.materialType);
-  const [donutTube, setDonutTube] = useState(defaultState.donutTube);
-  const [knotP, setKnotP] = useState(defaultState.knotP);
-  const [knotQ, setKnotQ] = useState(defaultState.knotQ);
-  const [isTransparent, setIsTransparent] = useState(defaultState.isTransparent);
-  const [backgroundColor, setBackgroundColor] = useState(defaultState.backgroundColor);
-  const [backgroundOpacity, setBackgroundOpacity] = useState(defaultState.backgroundOpacity);
-  const [wireframeOverlay, setWireframeOverlay] = useState(defaultState.wireframeOverlay);
-  const [exportSize, setExportSize] = useState(1024);
-  const [showHelp, setShowHelp] = useState(false);
-  const [isSceneReady, setIsSceneReady] = useState(false);
+interface ThreeSceneProps {
+  shape: Shape;
+  twist: number;
+  roundness: number;
+  taper: number;
+  noise: number;
+  rotationX: number;
+  rotationY: number;
+  rotationZ: number;
+  mainColor: string;
+  shadowTint: string;
+  lightColor: string;
+  lightX: number;
+  lightY: number;
+  lightZ: number;
+  shadowIntensity: number;
+  ambientIntensity: number;
+  materialType: MaterialType;
+  donutTube: number;
+  knotP: number;
+  knotQ: number;
+  isTransparent: boolean;
+  backgroundColor: string;
+  backgroundOpacity: number;
+  wireframeOverlay: boolean;
+  onSceneReady: () => void;
+  getRenderer: (renderer: THREE.WebGLRenderer) => void;
+  getScene: (scene: THREE.Scene) => void;
+  getCamera: (camera: THREE.PerspectiveCamera) => void;
+}
+
+const ThreeScene: React.FC<ThreeSceneProps> = (props) => {
+  const { onSceneReady, getRenderer, getScene, getCamera, ...rest } = props;
+  const {
+    shape, twist, roundness, taper, noise, rotationX, rotationY, rotationZ,
+    mainColor, shadowTint, lightColor, lightX, lightY, lightZ, shadowIntensity,
+    ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent,
+    backgroundColor, backgroundOpacity, wireframeOverlay
+  } = rest;
 
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
 
-  const shapes: Shape[] = ["cube", "sphere", "cylinder", "donut", "cone", "torusKnot", "icosahedron", "dodecahedron", "vase", "capsule", "octahedron", "tetrahedron"];
-  const materials: MaterialType[] = ["matte", "plastic", "metal", "glass", "porcelain", "velvet", "toon", "lambert", "normal", "wireframe"];
-
   // Initialize Scene and Renderer once on mount
   useEffect(() => {
-    if (!mountRef.current || rendererRef.current) return;
+    if (!mountRef.current) return;
 
     const width = 328;
     const height = 328;
-    const renderScale = 8; // Increased from 4 to 8 for better anti-aliasing
+    const renderScale = 8;
 
-    // --- Scene, Camera, Renderer Setup ---
     const scene = new THREE.Scene();
     sceneRef.current = scene;
+    getScene(scene);
 
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
     cameraRef.current = camera;
+    getCamera(camera);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -101,33 +109,28 @@ const App = () => {
     renderer.setSize(width * renderScale, height * renderScale);
     renderer.setClearColor(0x000000, 0);
     rendererRef.current = renderer;
+    getRenderer(renderer);
 
     const canvas = renderer.domElement;
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     mountRef.current.appendChild(canvas);
 
-    // --- Environment Map ---
     new RGBELoader().load(venice_sunset, function (texture) {
       texture.mapping = THREE.EquirectangularReflectionMapping;
       if (sceneRef.current) {
         sceneRef.current.environment = texture;
       }
-      setIsSceneReady(true);
+      onSceneReady();
     });
 
-    // --- Cleanup on unmount ---
     return () => {
       renderer.dispose();
       if (mountRef.current) {
         mountRef.current.innerHTML = "";
       }
-      rendererRef.current = null;
-      sceneRef.current = null;
-      cameraRef.current = null;
     };
   }, []);
-
 
   // Update and Render scene on property change
   useEffect(() => {
@@ -137,7 +140,6 @@ const App = () => {
 
     if (!scene || !camera || !renderer) return;
 
-    // --- Clear previous objects ---
     while (scene.children.length > 0) {
       const obj = scene.children[0];
       if (obj instanceof THREE.Mesh) {
@@ -158,7 +160,6 @@ const App = () => {
         renderer.setClearAlpha(backgroundOpacity);
     }
 
-    // --- Lights ---
     const ambientLight = new THREE.AmbientLight(lightColor, ambientIntensity);
     scene.add(ambientLight);
     const directionalLight = new THREE.DirectionalLight(new THREE.Color(lightColor), shadowIntensity);
@@ -204,14 +205,12 @@ const App = () => {
       const mesh = new THREE.Mesh(geometry, material);
       scene.add(mesh);
 
-      // Rotation
       mesh.rotation.set(
         THREE.MathUtils.degToRad(rotationX),
         THREE.MathUtils.degToRad(rotationY),
         THREE.MathUtils.degToRad(rotationZ)
       );
 
-      // Deformations
       geometry.computeBoundingBox();
       const bbox = geometry.boundingBox as THREE.Box3;
       const height = bbox.max.y - bbox.min.y;
@@ -223,12 +222,10 @@ const App = () => {
         
         const normalizedY = height > 0 ? (vertex.y - bbox.min.y) / height : 0;
 
-        // Taper
         const taperAmount = 1.0 - (normalizedY * taper);
         vertex.x *= taperAmount;
         vertex.z *= taperAmount;
 
-        // Noise
         if (noise > 0) {
           const noiseAngle = vertex.y * 2.0;
           const noiseAmount = Math.sin(noiseAngle) * noise * 0.2;
@@ -236,7 +233,6 @@ const App = () => {
           vertex.z += noiseAmount;
         }
 
-        // Twist
         const twistAngle = vertex.y * (twist * Math.PI / 180);
         const sin = Math.sin(twistAngle);
         const cos = Math.cos(twistAngle);
@@ -311,15 +307,64 @@ const App = () => {
             opacity: 0.5,
         });
         const wireframeMesh = new THREE.Mesh(geometry, wireframeMaterial);
+        wireframeMesh.rotation.set(
+          THREE.MathUtils.degToRad(rotationX),
+          THREE.MathUtils.degToRad(rotationY),
+          THREE.MathUtils.degToRad(rotationZ)
+        );
         scene.add(wireframeMesh);
     }
 
-    // --- Camera ---
     camera.position.set(0, 1, 5);
     camera.lookAt(0, 0, 0);
 
     renderer.render(scene, camera);
-  }, [shape, twist, roundness, taper, noise, rotationX, rotationY, rotationZ, mainColor, shadowTint, lightColor, lightX, lightY, lightZ, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent, backgroundColor, backgroundOpacity, wireframeOverlay, isSceneReady]);
+  }, [
+    shape, twist, roundness, taper, noise, rotationX, rotationY, rotationZ,
+    mainColor, shadowTint, lightColor, lightX, lightY, lightZ, shadowIntensity,
+    ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent,
+    backgroundColor, backgroundOpacity, wireframeOverlay
+  ]);
+
+  return <div ref={mountRef} className="renderPreview" />;
+};
+
+const App = () => {
+  const intl = useIntl();
+  const [shape, setShape] = useState<Shape>(defaultState.shape);
+  const [twist, setTwist] = useState(defaultState.twist);
+  const [roundness, setRoundness] = useState(defaultState.roundness);
+  const [taper, setTaper] = useState(defaultState.taper);
+  const [noise, setNoise] = useState(defaultState.noise);
+  const [rotationX, setRotationX] = useState(defaultState.rotationX);
+  const [rotationY, setRotationY] = useState(defaultState.rotationY);
+  const [rotationZ, setRotationZ] = useState(defaultState.rotationZ);
+  const [mainColor, setMainColor] = useState(defaultState.mainColor);
+  const [shadowTint, setShadowTint] = useState(defaultState.shadowTint);
+  const [lightColor, setLightColor] = useState(defaultState.lightColor);
+  const [lightX, setLightX] = useState(defaultState.lightX);
+  const [lightY, setLightY] = useState(defaultState.lightY);
+  const [lightZ, setLightZ] = useState(defaultState.lightZ);
+  const [shadowIntensity, setShadowIntensity] = useState(defaultState.shadowIntensity);
+  const [ambientIntensity, setAmbientIntensity] = useState(defaultState.ambientIntensity);
+  const [materialType, setMaterialType] = useState<MaterialType>(defaultState.materialType);
+  const [donutTube, setDonutTube] = useState(defaultState.donutTube);
+  const [knotP, setKnotP] = useState(defaultState.knotP);
+  const [knotQ, setKnotQ] = useState(defaultState.knotQ);
+  const [isTransparent, setIsTransparent] = useState(defaultState.isTransparent);
+  const [backgroundColor, setBackgroundColor] = useState(defaultState.backgroundColor);
+  const [backgroundOpacity, setBackgroundOpacity] = useState(defaultState.backgroundOpacity);
+  const [wireframeOverlay, setWireframeOverlay] = useState(defaultState.wireframeOverlay);
+  const [exportSize, setExportSize] = useState(1024);
+  const [showHelp, setShowHelp] = useState(false);
+  const [isSceneReady, setIsSceneReady] = useState(false);
+
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+
+  const shapes: Shape[] = ["cube", "sphere", "cylinder", "donut", "cone", "torusKnot", "icosahedron", "dodecahedron", "vase", "capsule", "octahedron", "tetrahedron"];
+  const materials: MaterialType[] = ["matte", "plastic", "metal", "glass", "porcelain", "velvet", "toon", "lambert", "normal", "wireframe"];
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -370,9 +415,8 @@ const App = () => {
     const renderer = rendererRef.current;
     const scene = sceneRef.current;
     const camera = cameraRef.current;
-    const mount = mountRef.current;
 
-    if (!renderer || !scene || !camera || !mount) return;
+    if (!renderer || !scene || !camera) return;
 
     const canvas = renderer.domElement;
 
@@ -440,7 +484,36 @@ const App = () => {
     <div className="container" style={{ padding: '16px' }}>
       <Rows spacing="1u">
         <Box>
-          <div ref={mountRef} className="renderPreview" />
+          <ThreeScene
+            shape={shape}
+            twist={twist}
+            roundness={roundness}
+            taper={taper}
+            noise={noise}
+            rotationX={rotationX}
+            rotationY={rotationY}
+            rotationZ={rotationZ}
+            mainColor={mainColor}
+            shadowTint={shadowTint}
+            lightColor={lightColor}
+            lightX={lightX}
+            lightY={lightY}
+            lightZ={lightZ}
+            shadowIntensity={shadowIntensity}
+            ambientIntensity={ambientIntensity}
+            materialType={materialType}
+            donutTube={donutTube}
+            knotP={knotP}
+            knotQ={knotQ}
+            isTransparent={isTransparent}
+            backgroundColor={backgroundColor}
+            backgroundOpacity={backgroundOpacity}
+            wireframeOverlay={wireframeOverlay}
+            onSceneReady={() => setIsSceneReady(true)}
+            getRenderer={(renderer) => (rendererRef.current = renderer)}
+            getScene={(scene) => (sceneRef.current = scene)}
+            getCamera={(camera) => (cameraRef.current = camera)}
+          />
         </Box>
         
         <Columns spacing="1u">
