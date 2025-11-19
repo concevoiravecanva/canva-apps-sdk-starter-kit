@@ -6,6 +6,7 @@ import { transform } from "@formatjs/ts-transformer";
 import chalk from "chalk";
 import { config } from "dotenv";
 import { Configuration as DevServerConfiguration } from "webpack-dev-server";
+import CopyPlugin from "copy-webpack-plugin";
 
 config();
 
@@ -113,6 +114,19 @@ export function buildConfig({
         },
         {
           test: /\.(woff|woff2)$/,
+          type: "asset/inline",
+        },
+        {
+          test: /\.hdr$/,
+          type: "asset/inline",
+          generator: {
+            dataUrl: {
+              mimetype: "application/octet-stream",
+            },
+          },
+        },
+        {
+          test: /helvetiker_regular\.typeface\.json$/,
           type: "asset/inline",
         },
         {
