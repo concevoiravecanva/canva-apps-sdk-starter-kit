@@ -11,20 +11,41 @@ import venice_sunset from 'assets/hdr/venice_sunset_1k.hdr';
 type Shape = "cube" | "sphere" | "cylinder" | "donut" | "cone" | "torusKnot" | "icosahedron" | "dodecahedron" | "vase";
 type MaterialType = "matte" | "metal" | "glass" | "velvet" | "toon" | "wireframe" | "plastic" | "porcelain" | "normal" | "lambert";
 
+const defaultState = {
+  shape: "cube" as Shape,
+  twist: 0,
+  roundness: 0.1,
+  taper: 0,
+  noise: 0,
+  angle: "isometric-left",
+  mainColor: "#4A90E2",
+  shadowTint: "#1E3A5F",
+  lightColor: "#FFFFFF",
+  shadowIntensity: 0.8,
+  ambientIntensity: 0.5,
+  materialType: "matte" as MaterialType,
+  donutTube: 0.4,
+  knotP: 2,
+  knotQ: 3,
+};
+
 const App = () => {
   const intl = useIntl();
-  const [shape, setShape] = useState<Shape>("cube");
-  const [twist, setTwist] = useState(0);
-  const [roundness, setRoundness] = useState(0.1);
-  const [taper, setTaper] = useState(0);
-  const [noise, setNoise] = useState(0);
-  const [angle, setAngle] = useState("isometric-left");
-  const [mainColor, setMainColor] = useState("#4A90E2");
-  const [shadowTint, setShadowTint] = useState("#1E3A5F");
-  const [lightColor, setLightColor] = useState("#FFFFFF");
-  const [shadowIntensity, setShadowIntensity] = useState(0.8);
-  const [ambientIntensity, setAmbientIntensity] = useState(0.5);
-  const [materialType, setMaterialType] = useState<MaterialType>("matte");
+  const [shape, setShape] = useState<Shape>(defaultState.shape);
+  const [twist, setTwist] = useState(defaultState.twist);
+  const [roundness, setRoundness] = useState(defaultState.roundness);
+  const [taper, setTaper] = useState(defaultState.taper);
+  const [noise, setNoise] = useState(defaultState.noise);
+  const [angle, setAngle] = useState(defaultState.angle);
+  const [mainColor, setMainColor] = useState(defaultState.mainColor);
+  const [shadowTint, setShadowTint] = useState(defaultState.shadowTint);
+  const [lightColor, setLightColor] = useState(defaultState.lightColor);
+  const [shadowIntensity, setShadowIntensity] = useState(defaultState.shadowIntensity);
+  const [ambientIntensity, setAmbientIntensity] = useState(defaultState.ambientIntensity);
+  const [materialType, setMaterialType] = useState<MaterialType>(defaultState.materialType);
+  const [donutTube, setDonutTube] = useState(defaultState.donutTube);
+  const [knotP, setKnotP] = useState(defaultState.knotP);
+  const [knotQ, setKnotQ] = useState(defaultState.knotQ);
 
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -221,22 +242,22 @@ const App = () => {
         geometry = new THREE.SphereGeometry(1.5, 32, 16);
         break;
       case "cylinder":
-        geometry = new THREE.CylinderGeometry(1.4, 1.4, 2.8, 32);
+        geometry = new THREE.CylinderGeometry(0.8, 0.8, 2, 64);
         break;
       case "donut":
-        geometry = new THREE.TorusGeometry(1.4, 0.6, 16, 100);
+        geometry = new THREE.TorusGeometry(1, donutTube, 64, 100);
         break;
       case "cone":
-        geometry = new THREE.ConeGeometry(1.4, 2.8, 32);
+        geometry = new THREE.ConeGeometry(1, 2, 64);
         break;
       case "torusKnot":
-        geometry = new THREE.TorusKnotGeometry(1, 0.3, 100, 16);
+        geometry = new THREE.TorusKnotGeometry(0.8, 0.25, 100, 16, knotP, knotQ);
         break;
       case "icosahedron":
-        geometry = new THREE.IcosahedronGeometry(1.8);
+        geometry = new THREE.IcosahedronGeometry(1.2, 0);
         break;
       case "dodecahedron":
-        geometry = new THREE.DodecahedronGeometry(1.8);
+        geometry = new THREE.DodecahedronGeometry(1.2, 0);
         break;
       case "vase": {
         const points: THREE.Vector2[] = [];
@@ -255,10 +276,9 @@ const App = () => {
     }
 
     renderer.render(scene, camera);
+  }, [shape, twist, roundness, taper, noise, angle, mainColor, shadowTint, lightColor, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ]);
 
-  }, [shape, twist, roundness, taper, noise, angle, mainColor, shadowTint, lightColor, shadowIntensity, ambientIntensity, materialType]);
-
-  const addToCanva = async () => {
+  const addToCanva = () => {
     const renderer = rendererRef.current;
     if (!renderer) return;
 
@@ -270,7 +290,7 @@ const App = () => {
     const canvas = renderer.domElement;
     const dataUrl = canvas.toDataURL("image/png");
 
-    await addElementAtPoint({
+    addElementAtPoint({
       type: "image",
       dataUrl,
       width: 1312,
@@ -281,6 +301,24 @@ const App = () => {
     });
   };
 
+  const handleReset = () => {
+    setShape(defaultState.shape);
+    setTwist(defaultState.twist);
+    setRoundness(defaultState.roundness);
+    setTaper(defaultState.taper);
+    setNoise(defaultState.noise);
+    setAngle(defaultState.angle);
+    setMainColor(defaultState.mainColor);
+    setShadowTint(defaultState.shadowTint);
+    setLightColor(defaultState.lightColor);
+    setShadowIntensity(defaultState.shadowIntensity);
+    setAmbientIntensity(defaultState.ambientIntensity);
+    setMaterialType(defaultState.materialType);
+    setDonutTube(defaultState.donutTube);
+    setKnotP(defaultState.knotP);
+    setKnotQ(defaultState.knotQ);
+  };
+
   return (
     <div className="container" style={{ padding: '16px' }}>
       <Rows spacing="1u">
@@ -288,9 +326,18 @@ const App = () => {
           <div ref={mountRef} className="renderPreview" />
         </Box>
         
-        <Button variant="primary" onClick={addToCanva} stretch>
-          {intl.formatMessage({ defaultMessage: "Add to Canva", description: "Button to add the 3D element to the Canva design" })}
-        </Button>
+        <Columns spacing="1u">
+            <Column>
+                <Button variant="primary" onClick={addToCanva} stretch>
+                    {intl.formatMessage({ defaultMessage: "Add to Canva", description: "Button to add the 3D element to the Canva design" })}
+                </Button>
+            </Column>
+            <Column>
+                <Button variant="secondary" onClick={handleReset} stretch>
+                    {intl.formatMessage({ defaultMessage: "Reset", description: "Button to reset all settings" })}
+                </Button>
+            </Column>
+        </Columns>
 
         <Accordion defaultExpanded>
           <AccordionItem title={intl.formatMessage({ defaultMessage: "Object", description: "Title for the Object settings section"})}>
@@ -377,6 +424,42 @@ const App = () => {
                     onChange={setRoundness}
                   />
                 </Box>
+              )}
+              {shape === 'donut' && (
+                <Box>
+                  <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Ring Thickness: {donutTube}", description: "Label for the donut tube slider" }, { donutTube: donutTube.toFixed(2) })}</Text>
+                  <Slider
+                    value={donutTube}
+                    min={0.1}
+                    max={0.8}
+                    step={0.05}
+                    onChange={setDonutTube}
+                  />
+                </Box>
+              )}
+              {shape === 'torusKnot' && (
+                <>
+                  <Box>
+                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "P-value: {knotP}", description: "Label for the knot P value slider" }, { knotP })}</Text>
+                    <Slider
+                      value={knotP}
+                      min={1}
+                      max={10}
+                      step={1}
+                      onChange={setKnotP}
+                    />
+                  </Box>
+                  <Box>
+                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Q-value: {knotQ}", description: "Label for the knot Q value slider" }, { knotQ })}</Text>
+                    <Slider
+                      value={knotQ}
+                      min={1}
+                      max={10}
+                      step={1}
+                      onChange={setKnotQ}
+                    />
+                  </Box>
+                </>
               )}
             </Rows>
           </AccordionItem>
