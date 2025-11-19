@@ -8,7 +8,7 @@ import "styles/components.css";
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import venice_sunset from 'assets/hdr/venice_sunset_1k.hdr';
 
-type Shape = "cube" | "sphere" | "cylinder" | "donut" | "cone" | "torusKnot" | "icosahedron" | "dodecahedron" | "vase";
+type Shape = "cube" | "sphere" | "cylinder" | "donut" | "cone" | "torusKnot" | "icosahedron" | "dodecahedron" | "vase" | "capsule" | "octahedron" | "tetrahedron";
 type MaterialType = "matte" | "metal" | "glass" | "velvet" | "toon" | "wireframe" | "plastic" | "porcelain" | "normal" | "lambert";
 
 const defaultState = {
@@ -24,6 +24,9 @@ const defaultState = {
   mainColor: "#4A90E2",
   shadowTint: "#1E3A5F",
   lightColor: "#FFFFFF",
+  lightX: 5,
+  lightY: 10,
+  lightZ: 7.5,
   shadowIntensity: 0.8,
   ambientIntensity: 0.5,
   materialType: "matte" as MaterialType,
@@ -63,6 +66,9 @@ const App = () => {
   const [mainColor, setMainColor] = useState(defaultState.mainColor);
   const [shadowTint, setShadowTint] = useState(defaultState.shadowTint);
   const [lightColor, setLightColor] = useState(defaultState.lightColor);
+  const [lightX, setLightX] = useState(defaultState.lightX);
+  const [lightY, setLightY] = useState(defaultState.lightY);
+  const [lightZ, setLightZ] = useState(defaultState.lightZ);
   const [shadowIntensity, setShadowIntensity] = useState(defaultState.shadowIntensity);
   const [ambientIntensity, setAmbientIntensity] = useState(defaultState.ambientIntensity);
   const [materialType, setMaterialType] = useState<MaterialType>(defaultState.materialType);
@@ -163,7 +169,7 @@ const App = () => {
     const ambientLight = new THREE.AmbientLight(lightColor, ambientIntensity);
     scene.add(ambientLight);
     const directionalLight = new THREE.DirectionalLight(new THREE.Color(lightColor), shadowIntensity);
-    directionalLight.position.set(5, 10, 7.5);
+    directionalLight.position.set(lightX, lightY, lightZ);
     scene.add(directionalLight);
 
     const createMesh = (geometry: THREE.BufferGeometry) => {
@@ -287,6 +293,15 @@ const App = () => {
         geometry = new THREE.LatheGeometry(points);
         break;
       }
+      case "capsule":
+        geometry = new THREE.CapsuleGeometry(1, 1, 4, 8);
+        break;
+      case "octahedron":
+        geometry = new THREE.OctahedronGeometry(1.5);
+        break;
+      case "tetrahedron":
+        geometry = new THREE.TetrahedronGeometry(1.5);
+        break;
       default:
         geometry = new RoundedBoxGeometry(2.2, 2.2, 2.2, 6, roundness * 10);
     }
@@ -329,7 +344,7 @@ const App = () => {
     camera.lookAt(0, 0, 0);
 
     renderer.render(scene, camera);
-  }, [shape, twist, roundness, taper, noise, angle, rotationX, rotationY, rotationZ, mainColor, shadowTint, lightColor, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent, backgroundColor, backgroundOpacity, wireframeOverlay]);
+  }, [shape, twist, roundness, taper, noise, angle, rotationX, rotationY, rotationZ, mainColor, shadowTint, lightColor, lightX, lightY, lightZ, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent, backgroundColor, backgroundOpacity, wireframeOverlay]);
 
   const addToCanva = () => {
     const renderer = rendererRef.current;
@@ -383,6 +398,9 @@ const App = () => {
     setMainColor(defaultState.mainColor);
     setShadowTint(defaultState.shadowTint);
     setLightColor(defaultState.lightColor);
+    setLightX(defaultState.lightX);
+    setLightY(defaultState.lightY);
+    setLightZ(defaultState.lightZ);
     setShadowIntensity(defaultState.shadowIntensity);
     setAmbientIntensity(defaultState.ambientIntensity);
     setMaterialType(defaultState.materialType);
@@ -411,6 +429,9 @@ const App = () => {
         case "mainColor": setMainColor(value as string); break;
         case "shadowTint": setShadowTint(value as string); break;
         case "lightColor": setLightColor(value as string); break;
+        case "lightX": setLightX(value as number); break;
+        case "lightY": setLightY(value as number); break;
+        case "lightZ": setLightZ(value as number); break;
         case "shadowIntensity": setShadowIntensity(value as number); break;
         case "ambientIntensity": setAmbientIntensity(value as number); break;
         case "materialType": setMaterialType(value as MaterialType); break;
@@ -472,6 +493,9 @@ const App = () => {
                     { value: "icosahedron", label: intl.formatMessage({ defaultMessage: "Icosahedron", description: "Icosahedron shape option" }) },
                     { value: "dodecahedron", label: intl.formatMessage({ defaultMessage: "Dodecahedron", description: "Dodecahedron shape option" }) },
                     { value: "vase", label: intl.formatMessage({ defaultMessage: "Vase", description: "Vase shape option" }) },
+                    { value: "capsule", label: intl.formatMessage({ defaultMessage: "Capsule", description: "Capsule shape option" }) },
+                    { value: "octahedron", label: intl.formatMessage({ defaultMessage: "Octahedron", description: "Octahedron shape option" }) },
+                    { value: "tetrahedron", label: intl.formatMessage({ defaultMessage: "Tetrahedron", description: "Tetrahedron shape option" }) },
                   ]}
                   onChange={(value) => setShape(value as Shape)}
                 />
@@ -667,6 +691,41 @@ const App = () => {
                   step={0.1}
                   onChange={setAmbientIntensity}
                 />
+              </Box>
+              <Box>
+                <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Light Position", description: "Label for the light position sliders" })}</Text>
+                <Rows spacing="1u">
+                   <Box>
+                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "X: {lightX}", description: "Label for the light X position slider" }, { lightX: lightX.toFixed(1) })}</Text>
+                    <Slider
+                      value={lightX}
+                      min={-20}
+                      max={20}
+                      step={0.5}
+                      onChange={setLightX}
+                    />
+                  </Box>
+                  <Box>
+                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Y: {lightY}", description: "Label for the light Y position slider" }, { lightY: lightY.toFixed(1) })}</Text>
+                    <Slider
+                      value={lightY}
+                      min={-20}
+                      max={20}
+                      step={0.5}
+                      onChange={setLightY}
+                    />
+                  </Box>
+                  <Box>
+                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Z: {lightZ}", description: "Label for the light Z position slider" }, { lightZ: lightZ.toFixed(1) })}</Text>
+                    <Slider
+                      value={lightZ}
+                      min={-20}
+                      max={20}
+                      step={0.5}
+                      onChange={setLightZ}
+                    />
+                  </Box>
+                </Rows>
               </Box>
               <Checkbox
                 label={intl.formatMessage({ defaultMessage: "Transparent Background", description: "Checkbox to toggle transparent background" })}
