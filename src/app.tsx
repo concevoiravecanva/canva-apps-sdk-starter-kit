@@ -33,6 +33,19 @@ const defaultState = {
   wireframeOverlay: false,
 };
 
+type Preset = {
+  name: string;
+  settings: Partial<typeof defaultState>;
+};
+
+const presets: Preset[] = [
+  { name: "Golden Sphere", settings: { shape: "sphere", materialType: "metal", mainColor: "#FFD700", shadowTint: "#D4AF37" } },
+  { name: "Glass Cube", settings: { shape: "cube", materialType: "glass", mainColor: "#EAF2F8", roundness: 0.2 } },
+  { name: "Twisted Metal", settings: { shape: "torusKnot", materialType: "metal", mainColor: "#C0C0C0", twist: 90, knotP: 3, knotQ: 4 } },
+  { name: "Plastic Donut", settings: { shape: "donut", materialType: "plastic", mainColor: "#FF69B4", donutTube: 0.5 } },
+  { name: "Velvet Cone", settings: { shape: "cone", materialType: "velvet", mainColor: "#800080", shadowTint: "#4B0082" } },
+];
+
 const App = () => {
   const intl = useIntl();
   const [shape, setShape] = useState<Shape>(defaultState.shape);
@@ -54,6 +67,7 @@ const App = () => {
   const [backgroundColor, setBackgroundColor] = useState(defaultState.backgroundColor);
   const [backgroundOpacity, setBackgroundOpacity] = useState(defaultState.backgroundOpacity);
   const [wireframeOverlay, setWireframeOverlay] = useState(defaultState.wireframeOverlay);
+  const [exportSize, setExportSize] = useState(1024);
 
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -306,23 +320,39 @@ const App = () => {
 
   const addToCanva = () => {
     const renderer = rendererRef.current;
-    if (!renderer) return;
+    const scene = sceneRef.current;
+    const camera = cameraRef.current;
+    const mount = mountRef.current;
 
-    // Force a render to ensure the canvas is up-to-date
-    if (sceneRef.current && cameraRef.current) {
-      renderer.render(sceneRef.current, cameraRef.current);
-    }
+    if (!renderer || !scene || !camera || !mount) return;
 
     const canvas = renderer.domElement;
-    const dataUrl = canvas.toDataURL("image/png");
+
+    // Temporarily resize for export
+    const originalSize = new THREE.Vector2();
+    renderer.getSize(originalSize);
+    const originalStyle = { width: canvas.style.width, height: canvas.style.height };
+    
+    renderer.setSize(exportSize, exportSize);
+    canvas.style.width = `${exportSize}px`;
+    canvas.style.height = `${exportSize}px`;
+    renderer.render(scene, camera);
+
+    const dataUrl = renderer.domElement.toDataURL("image/png");
+
+    // Restore original size for preview
+    renderer.setSize(originalSize.x, originalSize.y);
+    canvas.style.width = originalStyle.width;
+    canvas.style.height = originalStyle.height;
+    renderer.render(scene, camera);
 
     addElementAtPoint({
       type: "image",
       dataUrl,
-      width: 1312,
-      height: 1312,
-      top: 0,
-      left: 0,
+      width: 328,
+      height: 328,
+      top: 100,
+      left: 100,
       altText: { text: "", decorative: true },
     });
   };
@@ -349,6 +379,34 @@ const App = () => {
     setWireframeOverlay(defaultState.wireframeOverlay);
   };
 
+  const applyPreset = (preset: Preset) => {
+    handleReset(); // Reset to default before applying preset
+    Object.entries(preset.settings).forEach(([key, value]) => {
+      switch (key) {
+        case "shape": setShape(value as Shape); break;
+        case "twist": setTwist(value as number); break;
+        case "roundness": setRoundness(value as number); break;
+        case "taper": setTaper(value as number); break;
+        case "noise": setNoise(value as number); break;
+        case "angle": setAngle(value as string); break;
+        case "mainColor": setMainColor(value as string); break;
+        case "shadowTint": setShadowTint(value as string); break;
+        case "lightColor": setLightColor(value as string); break;
+        case "shadowIntensity": setShadowIntensity(value as number); break;
+        case "ambientIntensity": setAmbientIntensity(value as number); break;
+        case "materialType": setMaterialType(value as MaterialType); break;
+        case "donutTube": setDonutTube(value as number); break;
+        case "knotP": setKnotP(value as number); break;
+        case "knotQ": setKnotQ(value as number); break;
+        case "isTransparent": setIsTransparent(value as boolean); break;
+        case "backgroundColor": setBackgroundColor(value as string); break;
+        case "backgroundOpacity": setBackgroundOpacity(value as number); break;
+        case "wireframeOverlay": setWireframeOverlay(value as boolean); break;
+        default: break;
+      }
+    });
+  };
+
   return (
     <div className="container" style={{ padding: '16px' }}>
       <Rows spacing="1u">
@@ -369,8 +427,17 @@ const App = () => {
             </Column>
         </Columns>
 
-        <Accordion defaultExpanded>
-          <AccordionItem title={intl.formatMessage({ defaultMessage: "Object", description: "Title for the Object settings section"})}>
+        <Accordion>
+          <AccordionItem title={intl.formatMessage({ defaultMessage: "Style Presets", description: "Title for the Style Presets section"})}>
+            <Rows spacing="1u">
+              {presets.map(p => (
+                <Button key={p.name} variant="secondary" onClick={() => applyPreset(p)} stretch>
+                  {p.name}
+                </Button>
+              ))}
+            </Rows>
+          </AccordionItem>
+          <AccordionItem title={intl.formatMessage({ defaultMessage: "Object", description: "Title for the Object settings section"})} defaultExpanded>
             <Rows spacing="1.5u">
               <Rows spacing="0.5u">
                 <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Shape", description: "Label for the shape selection dropdown" })}</Text>
@@ -592,6 +659,21 @@ const App = () => {
                   { value: "side", label: intl.formatMessage({ defaultMessage: "Side", description: "Side camera angle" }) },
                 ]}
                 onChange={setAngle}
+              />
+            </Rows>
+          </AccordionItem>
+           <AccordionItem title={intl.formatMessage({ defaultMessage: "Export Settings", description: "Title for the Export Settings section"})}>
+            <Rows spacing="1.5u">
+              <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Export Size", description: "Label for the export size selection dropdown" })}</Text>
+              <Select
+                value={exportSize}
+                options={[
+                  { value: 512, label: "512px" },
+                  { value: 1024, label: "1024px" },
+                  { value: 2048, label: "2048px" },
+                  { value: 4096, label: "4096px" },
+                ]}
+                onChange={(value) => setExportSize(value as number)}
               />
             </Rows>
           </AccordionItem>
