@@ -29,6 +29,7 @@ const defaultState = {
   knotQ: 3,
   isTransparent: true,
   backgroundColor: "#FFFFFF",
+  backgroundOpacity: 1,
   wireframeOverlay: false,
 };
 
@@ -51,6 +52,7 @@ const App = () => {
   const [knotQ, setKnotQ] = useState(defaultState.knotQ);
   const [isTransparent, setIsTransparent] = useState(defaultState.isTransparent);
   const [backgroundColor, setBackgroundColor] = useState(defaultState.backgroundColor);
+  const [backgroundOpacity, setBackgroundOpacity] = useState(defaultState.backgroundOpacity);
   const [wireframeOverlay, setWireframeOverlay] = useState(defaultState.wireframeOverlay);
 
   const mountRef = useRef<HTMLDivElement>(null);
@@ -118,23 +120,23 @@ const App = () => {
 
     // --- Clear previous objects ---
     while (scene.children.length > 0) {
-      const object = scene.children[0];
-      if (object instanceof THREE.Mesh) {
-        object.geometry.dispose();
-        if (Array.isArray(object.material)) {
-          object.material.forEach(material => material.dispose());
+      const obj = scene.children[0];
+      if (obj instanceof THREE.Mesh) {
+        obj.geometry.dispose();
+        if (Array.isArray(obj.material)) {
+          obj.material.forEach(material => material.dispose());
         } else {
-          object.material.dispose();
+          obj.material.dispose();
         }
       }
-      scene.remove(object);
+      scene.remove(obj);
     }
     
     if (isTransparent) {
         renderer.setClearAlpha(0);
     } else {
         renderer.setClearColor(backgroundColor);
-        renderer.setClearAlpha(1);
+        renderer.setClearAlpha(backgroundOpacity);
     }
 
     // --- Lights ---
@@ -300,7 +302,7 @@ const App = () => {
     camera.lookAt(0, 0, 0);
 
     renderer.render(scene, camera);
-  }, [shape, twist, roundness, taper, noise, angle, mainColor, shadowTint, lightColor, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent, backgroundColor, wireframeOverlay]);
+  }, [shape, twist, roundness, taper, noise, angle, mainColor, shadowTint, lightColor, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent, backgroundColor, backgroundOpacity, wireframeOverlay]);
 
   const addToCanva = () => {
     const renderer = rendererRef.current;
@@ -343,6 +345,7 @@ const App = () => {
     setKnotQ(defaultState.knotQ);
     setIsTransparent(defaultState.isTransparent);
     setBackgroundColor(defaultState.backgroundColor);
+    setBackgroundOpacity(defaultState.backgroundOpacity);
     setWireframeOverlay(defaultState.wireframeOverlay);
   };
 
@@ -553,12 +556,24 @@ const App = () => {
                 onChange={(_, checked) => setIsTransparent(checked)}
               />
               {!isTransparent && (
-                <Rows spacing="0.5u">
-                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Background Color", description: "Label for the background color selector" })}</Text>
-                    <ColorSelector
-                        color={backgroundColor}
-                        onChange={setBackgroundColor}
-                    />
+                <Rows spacing="1u">
+                    <Rows spacing="0.5u">
+                        <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Background Color", description: "Label for the background color selector" })}</Text>
+                        <ColorSelector
+                            color={backgroundColor}
+                            onChange={setBackgroundColor}
+                        />
+                    </Rows>
+                     <Box>
+                        <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Opacity: {opacity}%", description: "Label for background opacity slider" }, { opacity: Math.round(backgroundOpacity * 100) })}</Text>
+                        <Slider
+                            value={backgroundOpacity}
+                            min={0}
+                            max={1}
+                            step={0.01}
+                            onChange={setBackgroundOpacity}
+                        />
+                    </Box>
                 </Rows>
               )}
             </Rows>
