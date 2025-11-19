@@ -1,14 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from 'three-stdlib';
-import { Rows, Text, Select, Button, ColorSelector, Box, Slider, Columns, Column, Accordion, AccordionItem, Checkbox } from "@canva/app-ui-kit";
+import { Rows, Text, Select, Button, ColorSelector, Box, Slider, Columns, Column, Accordion, AccordionItem, Checkbox, Alert } from "@canva/app-ui-kit";
 import { addElementAtPoint } from "@canva/design";
 import { useIntl } from "react-intl";
 import "styles/components.css";
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import venice_sunset from 'assets/hdr/venice_sunset_1k.hdr';
-import HelpPage from "./HelpPage";
-import { InfoIcon } from "@canva/app-ui-kit";
 
 type Shape = "cube" | "sphere" | "cylinder" | "donut" | "cone" | "torusKnot" | "icosahedron" | "dodecahedron" | "vase" | "capsule" | "octahedron" | "tetrahedron";
 type MaterialType = "matte" | "metal" | "glass" | "velvet" | "toon" | "wireframe" | "plastic" | "porcelain" | "normal" | "lambert";
@@ -356,7 +354,6 @@ const App = () => {
   const [backgroundOpacity, setBackgroundOpacity] = useState(defaultState.backgroundOpacity);
   const [wireframeOverlay, setWireframeOverlay] = useState(defaultState.wireframeOverlay);
   const [exportSize, setExportSize] = useState(1024);
-  const [showHelp, setShowHelp] = useState(false);
   const [isSceneReady, setIsSceneReady] = useState(false);
 
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -368,37 +365,46 @@ const App = () => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case 'Enter':
+      switch (event.key.toLowerCase()) {
+        case 'enter':
+          event.preventDefault();
           addToCanva();
           break;
         case 'r':
-        case 'R':
+          event.preventDefault();
           handleReset();
           break;
-        case 'h':
-        case 'H':
-          setShowHelp(prev => !prev);
-          break;
         case 'c':
-        case 'C':
+          event.preventDefault();
           setShape(prev => shapes[(shapes.indexOf(prev) + 1) % shapes.length]);
           break;
         case 'm':
-        case 'M':
+          event.preventDefault();
           setMaterialType(prev => materials[(materials.indexOf(prev) + 1) % materials.length]);
           break;
-        case 'ArrowUp':
+        case 'q':
+          event.preventDefault();
           setRotationX(prev => (prev + 5) % 360);
           break;
-        case 'ArrowDown':
+        case 'a':
+          event.preventDefault();
           setRotationX(prev => (prev - 5 + 360) % 360);
           break;
-        case 'ArrowLeft':
+        case 'w':
+          event.preventDefault();
+          setRotationY(prev => (prev + 5) % 360);
+          break;
+        case 's':
+          event.preventDefault();
           setRotationY(prev => (prev - 5 + 360) % 360);
           break;
-        case 'ArrowRight':
-          setRotationY(prev => (prev + 5) % 360);
+        case 'e':
+          event.preventDefault();
+          setRotationZ(prev => (prev + 5) % 360);
+          break;
+        case 'd':
+          event.preventDefault();
+          setRotationZ(prev => (prev - 5 + 360) % 360);
           break;
         default:
           break;
@@ -475,10 +481,6 @@ const App = () => {
     setBackgroundOpacity(defaultState.backgroundOpacity);
     setWireframeOverlay(defaultState.wireframeOverlay);
   };
-
-  if (showHelp) {
-    return <HelpPage onBack={() => setShowHelp(false)} />;
-  }
 
   return (
     <div className="container" style={{ padding: '16px' }}>
@@ -827,11 +829,172 @@ const App = () => {
               />
             </Rows>
           </AccordionItem>
-        </Accordion>
 
-        <Button variant="secondary" onClick={() => setShowHelp(true)} icon={InfoIcon} stretch>
-            {intl.formatMessage({ defaultMessage: "Help & Shortcuts", description: "Button to open help page" })}
-        </Button>
+          <AccordionItem title={intl.formatMessage({ defaultMessage: "Keyboard Shortcuts", description: "Title for the Keyboard Shortcuts section"})}>
+            <Rows spacing="1.5u">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Text size="xsmall">
+                  {intl.formatMessage({ defaultMessage: "Add to design:", description: "Shortcut description" })}
+                </Text>
+                <span style={{
+                  display: 'inline-flex',
+                  padding: '2px 6px',
+                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
+                  border: '1px solid var(--ui-kit-color-ui-border)',
+                  borderRadius: 6,
+                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
+                  fontSize: 13,
+                  color: 'var(--ui-kit-color-content-fg)',
+                }}>
+                  {intl.formatMessage({ defaultMessage: "Enter", description: "Keyboard key name" })}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Text size="xsmall">
+                  {intl.formatMessage({ defaultMessage: "Reset settings:", description: "Shortcut description" })}
+                </Text>
+                <span style={{
+                  display: 'inline-flex',
+                  padding: '2px 6px',
+                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
+                  border: '1px solid var(--ui-kit-color-ui-border)',
+                  borderRadius: 6,
+                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
+                  fontSize: 13,
+                  color: 'var(--ui-kit-color-content-fg)',
+                }}>
+                  {intl.formatMessage({ defaultMessage: "R", description: "Keyboard key name" })}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Text size="xsmall">
+                  {intl.formatMessage({ defaultMessage: "Cycle through shapes:", description: "Shortcut description" })}
+                </Text>
+                <span style={{
+                  display: 'inline-flex',
+                  padding: '2px 6px',
+                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
+                  border: '1px solid var(--ui-kit-color-ui-border)',
+                  borderRadius: 6,
+                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
+                  fontSize: 13,
+                  color: 'var(--ui-kit-color-content-fg)',
+                }}>
+                  {intl.formatMessage({ defaultMessage: "C", description: "Keyboard key name" })}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Text size="xsmall">
+                  {intl.formatMessage({ defaultMessage: "Cycle through materials:", description: "Shortcut description" })}
+                </Text>
+                <span style={{
+                  display: 'inline-flex',
+                  padding: '2px 6px',
+                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
+                  border: '1px solid var(--ui-kit-color-ui-border)',
+                  borderRadius: 6,
+                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
+                  fontSize: 13,
+                  color: 'var(--ui-kit-color-content-fg)',
+                }}>
+                  {intl.formatMessage({ defaultMessage: "M", description: "Keyboard key name" })}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <Text size="xsmall">
+                  {intl.formatMessage({ defaultMessage: "Rotate X-axis:", description: "Shortcut description" })}
+                </Text>
+                <span style={{
+                  display: 'inline-flex',
+                  padding: '2px 6px',
+                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
+                  border: '1px solid var(--ui-kit-color-ui-border)',
+                  borderRadius: 6,
+                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
+                  fontSize: 13,
+                  color: 'var(--ui-kit-color-content-fg)',
+                }}>
+                  {intl.formatMessage({ defaultMessage: "Q", description: "Keyboard key name" })}
+                </span>
+                <span style={{
+                  display: 'inline-flex',
+                  padding: '2px 6px',
+                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
+                  border: '1px solid var(--ui-kit-color-ui-border)',
+                  borderRadius: 6,
+                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
+                  fontSize: 13,
+                  color: 'var(--ui-kit-color-content-fg)',
+                }}>
+                  {intl.formatMessage({ defaultMessage: "A", description: "Keyboard key name" })}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <Text size="xsmall">
+                  {intl.formatMessage({ defaultMessage: "Rotate Y-axis:", description: "Shortcut description" })}
+                </Text>
+                <span style={{
+                  display: 'inline-flex',
+                  padding: '2px 6px',
+                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
+                  border: '1px solid var(--ui-kit-color-ui-border)',
+                  borderRadius: 6,
+                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
+                  fontSize: 13,
+                  color: 'var(--ui-kit-color-content-fg)',
+                }}>
+                  {intl.formatMessage({ defaultMessage: "W", description: "Keyboard key name" })}
+                </span>
+                <span style={{
+                  display: 'inline-flex',
+                  padding: '2px 6px',
+                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
+                  border: '1px solid var(--ui-kit-color-ui-border)',
+                  borderRadius: 6,
+                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
+                  fontSize: 13,
+                  color: 'var(--ui-kit-color-content-fg)',
+                }}>
+                  {intl.formatMessage({ defaultMessage: "S", description: "Keyboard key name" })}
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <Text size="xsmall">
+                  {intl.formatMessage({ defaultMessage: "Rotate Z-axis:", description: "Shortcut description" })}
+                </Text>
+                <span style={{
+                  display: 'inline-flex',
+                  padding: '2px 6px',
+                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
+                  border: '1px solid var(--ui-kit-color-ui-border)',
+                  borderRadius: 6,
+                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
+                  fontSize: 13,
+                  color: 'var(--ui-kit-color-content-fg)',
+                }}>
+                  {intl.formatMessage({ defaultMessage: "E", description: "Keyboard key name" })}
+                </span>
+                <span style={{
+                  display: 'inline-flex',
+                  padding: '2px 6px',
+                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
+                  border: '1px solid var(--ui-kit-color-ui-border)',
+                  borderRadius: 6,
+                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
+                  fontSize: 13,
+                  color: 'var(--ui-kit-color-content-fg)',
+                }}>
+                  {intl.formatMessage({ defaultMessage: "D", description: "Keyboard key name" })}
+                </span>
+              </div>
+              <Box paddingTop="1u">
+                <Alert tone="info">
+                  {intl.formatMessage({ defaultMessage: "These keyboard shortcuts only work when the app is active.", description: "Info alert about shortcuts" })}
+                </Alert>
+              </Box>
+            </Rows>
+          </AccordionItem>
+        </Accordion>
 
       </Rows>
     </div>
