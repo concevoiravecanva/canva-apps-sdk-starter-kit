@@ -7,6 +7,8 @@ import { useIntl } from "react-intl";
 import "styles/components.css";
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import venice_sunset from 'assets/hdr/venice_sunset_1k.hdr';
+import HelpPage from "./HelpPage";
+import { InfoIcon } from "@canva/app-ui-kit";
 
 type Shape = "cube" | "sphere" | "cylinder" | "donut" | "cone" | "torusKnot" | "icosahedron" | "dodecahedron" | "vase" | "capsule" | "octahedron" | "tetrahedron";
 type MaterialType = "matte" | "metal" | "glass" | "velvet" | "toon" | "wireframe" | "plastic" | "porcelain" | "normal" | "lambert";
@@ -67,11 +69,15 @@ const App = () => {
   const [backgroundOpacity, setBackgroundOpacity] = useState(defaultState.backgroundOpacity);
   const [wireframeOverlay, setWireframeOverlay] = useState(defaultState.wireframeOverlay);
   const [exportSize, setExportSize] = useState(1024);
+  const [showHelp, setShowHelp] = useState(false);
 
   const mountRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+
+  const shapes: Shape[] = ["cube", "sphere", "cylinder", "donut", "cone", "torusKnot", "icosahedron", "dodecahedron", "vase", "capsule", "octahedron", "tetrahedron"];
+  const materials: MaterialType[] = ["matte", "plastic", "metal", "glass", "porcelain", "velvet", "toon", "lambert", "normal", "wireframe"];
 
   // Initialize Scene and Renderer once on mount
   useEffect(() => {
@@ -333,6 +339,51 @@ const App = () => {
     renderer.render(scene, camera);
   }, [shape, twist, roundness, taper, noise, angle, rotationX, rotationY, rotationZ, mainColor, shadowTint, lightColor, lightX, lightY, lightZ, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent, backgroundColor, backgroundOpacity, wireframeOverlay]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case 'Enter':
+          addToCanva();
+          break;
+        case 'r':
+        case 'R':
+          handleReset();
+          break;
+        case 'h':
+        case 'H':
+          setShowHelp(prev => !prev);
+          break;
+        case 'c':
+        case 'C':
+          setShape(prev => shapes[(shapes.indexOf(prev) + 1) % shapes.length]);
+          break;
+        case 'm':
+        case 'M':
+          setMaterialType(prev => materials[(materials.indexOf(prev) + 1) % materials.length]);
+          break;
+        case 'ArrowUp':
+          setRotationX(prev => (prev + 5) % 360);
+          break;
+        case 'ArrowDown':
+          setRotationX(prev => (prev - 5 + 360) % 360);
+          break;
+        case 'ArrowLeft':
+          setRotationY(prev => (prev - 5 + 360) % 360);
+          break;
+        case 'ArrowRight':
+          setRotationY(prev => (prev + 5) % 360);
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [shapes, materials]);
+
   const addToCanva = () => {
     const renderer = rendererRef.current;
     const scene = sceneRef.current;
@@ -399,6 +450,10 @@ const App = () => {
     setBackgroundOpacity(defaultState.backgroundOpacity);
     setWireframeOverlay(defaultState.wireframeOverlay);
   };
+
+  if (showHelp) {
+    return <HelpPage onBack={() => setShowHelp(false)} />;
+  }
 
   return (
     <div className="container" style={{ padding: '16px' }}>
@@ -732,6 +787,10 @@ const App = () => {
             </Rows>
           </AccordionItem>
         </Accordion>
+
+        <Button variant="secondary" onClick={() => setShowHelp(true)} icon={InfoIcon} stretch>
+            {intl.formatMessage({ defaultMessage: "Help & Shortcuts", description: "Button to open help page" })}
+        </Button>
 
       </Rows>
     </div>
