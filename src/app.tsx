@@ -39,19 +39,6 @@ const defaultState = {
   wireframeOverlay: false,
 };
 
-type Preset = {
-  name: string;
-  settings: Partial<typeof defaultState>;
-};
-
-const presets: Preset[] = [
-  { name: "Golden Sphere", settings: { shape: "sphere", materialType: "metal", mainColor: "#FFD700", shadowTint: "#D4AF37" } },
-  { name: "Glass Cube", settings: { shape: "cube", materialType: "glass", mainColor: "#EAF2F8", roundness: 0.2 } },
-  { name: "Twisted Metal", settings: { shape: "torusKnot", materialType: "metal", mainColor: "#C0C0C0", twist: 90, knotP: 3, knotQ: 4 } },
-  { name: "Plastic Donut", settings: { shape: "donut", materialType: "plastic", mainColor: "#FF69B4", donutTube: 0.5 } },
-  { name: "Velvet Cone", settings: { shape: "cone", materialType: "velvet", mainColor: "#800080", shadowTint: "#4B0082" } },
-];
-
 const App = () => {
   const intl = useIntl();
   const [shape, setShape] = useState<Shape>(defaultState.shape);
@@ -413,40 +400,6 @@ const App = () => {
     setWireframeOverlay(defaultState.wireframeOverlay);
   };
 
-  const applyPreset = (preset: Preset) => {
-    handleReset(); // Reset to default before applying preset
-    Object.entries(preset.settings).forEach(([key, value]) => {
-      switch (key) {
-        case "shape": setShape(value as Shape); break;
-        case "twist": setTwist(value as number); break;
-        case "roundness": setRoundness(value as number); break;
-        case "taper": setTaper(value as number); break;
-        case "noise": setNoise(value as number); break;
-        case "angle": setAngle(value as string); break;
-        case "rotationX": setRotationX(value as number); break;
-        case "rotationY": setRotationY(value as number); break;
-        case "rotationZ": setRotationZ(value as number); break;
-        case "mainColor": setMainColor(value as string); break;
-        case "shadowTint": setShadowTint(value as string); break;
-        case "lightColor": setLightColor(value as string); break;
-        case "lightX": setLightX(value as number); break;
-        case "lightY": setLightY(value as number); break;
-        case "lightZ": setLightZ(value as number); break;
-        case "shadowIntensity": setShadowIntensity(value as number); break;
-        case "ambientIntensity": setAmbientIntensity(value as number); break;
-        case "materialType": setMaterialType(value as MaterialType); break;
-        case "donutTube": setDonutTube(value as number); break;
-        case "knotP": setKnotP(value as number); break;
-        case "knotQ": setKnotQ(value as number); break;
-        case "isTransparent": setIsTransparent(value as boolean); break;
-        case "backgroundColor": setBackgroundColor(value as string); break;
-        case "backgroundOpacity": setBackgroundOpacity(value as number); break;
-        case "wireframeOverlay": setWireframeOverlay(value as boolean); break;
-        default: break;
-      }
-    });
-  };
-
   return (
     <div className="container" style={{ padding: '16px' }}>
       <Rows spacing="1u">
@@ -468,15 +421,6 @@ const App = () => {
         </Columns>
 
         <Accordion>
-          <AccordionItem title={intl.formatMessage({ defaultMessage: "Style Presets", description: "Title for the Style Presets section"})}>
-            <Rows spacing="1u">
-              {presets.map(p => (
-                <Button key={p.name} variant="secondary" onClick={() => applyPreset(p)} stretch>
-                  {p.name}
-                </Button>
-              ))}
-            </Rows>
-          </AccordionItem>
           <AccordionItem title={intl.formatMessage({ defaultMessage: "Object", description: "Title for the Object settings section"})} defaultExpanded>
             <Rows spacing="1.5u">
               <Rows spacing="0.5u">
