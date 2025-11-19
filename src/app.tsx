@@ -3,10 +3,11 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from 'three-stdlib';
 import { Rows, Text, Select, Button, ColorSelector, Box, Slider, Columns, Column, Accordion, AccordionItem, Checkbox, Alert } from "@canva/app-ui-kit";
 import { addElementAtPoint } from "@canva/design";
-import { useIntl } from "react-intl";
+import { useIntl, IntlShape } from "react-intl";
 import "styles/components.css";
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import venice_sunset from 'assets/hdr/venice_sunset_1k.hdr';
+import { messages } from './i18n/messages';
 
 type Shape = "cube" | "sphere" | "cylinder" | "donut" | "cone" | "torusKnot" | "icosahedron" | "dodecahedron" | "vase" | "capsule" | "octahedron" | "tetrahedron";
 type MaterialType = "matte" | "metal" | "glass" | "velvet" | "toon" | "wireframe" | "plastic" | "porcelain" | "normal" | "lambert";
@@ -67,10 +68,11 @@ interface ThreeSceneProps {
   getRenderer: (renderer: THREE.WebGLRenderer) => void;
   getScene: (scene: THREE.Scene) => void;
   getCamera: (camera: THREE.PerspectiveCamera) => void;
+  intl: IntlShape;
 }
 
 const ThreeScene: React.FC<ThreeSceneProps> = (props) => {
-  const { onSceneReady, getRenderer, getScene, getCamera, ...rest } = props;
+  const { onSceneReady, getRenderer, getScene, getCamera, intl, ...rest } = props;
   const {
     shape, twist, roundness, taper, noise, rotationX, rotationY, rotationZ,
     mainColor, shadowTint, lightColor, lightX, lightY, lightZ, shadowIntensity,
@@ -328,7 +330,7 @@ const ThreeScene: React.FC<ThreeSceneProps> = (props) => {
     backgroundColor, backgroundOpacity, wireframeOverlay
   ]);
 
-  return <div ref={mountRef} className="renderPreview" />;
+  return <div ref={mountRef} className="renderPreview" role="img" aria-label={intl.formatMessage(messages.renderPreviewAriaLabel)} />;
 };
 
 const App = () => {
@@ -455,7 +457,7 @@ const App = () => {
       height: 328,
       top: 100,
       left: 100,
-      altText: { text: "", decorative: true },
+      altText: { text: intl.formatMessage({defaultMessage: "A 3D rendered object", description: "Alt text for the exported image"}), decorative: false },
     });
   };
 
@@ -519,80 +521,81 @@ const App = () => {
             getRenderer={(renderer) => (rendererRef.current = renderer)}
             getScene={(scene) => (sceneRef.current = scene)}
             getCamera={(camera) => (cameraRef.current = camera)}
+            intl={intl}
           />
         </Box>
         
         <Columns spacing="1u">
             <Column>
-                <Button variant="primary" onClick={addToCanva} stretch disabled={!isSceneReady} loading={!isSceneReady}>
+                <Button variant="primary" onClick={addToCanva} stretch disabled={!isSceneReady} loading={!isSceneReady} ariaLabel={intl.formatMessage(messages.addToCanvaAriaLabel)}>
                     {isSceneReady
-                        ? intl.formatMessage({ defaultMessage: "Add to Canva", description: "Button to add the 3D element to the Canva design" })
-                        : intl.formatMessage({ defaultMessage: "Loading Scene...", description: "Loading state for the add to canva button" })
+                        ? intl.formatMessage(messages.addToCanva)
+                        : intl.formatMessage(messages.loadingScene)
                     }
                 </Button>
             </Column>
             <Column>
-                <Button variant="secondary" onClick={handleReset} stretch>
-                    {intl.formatMessage({ defaultMessage: "Reset", description: "Button to reset all settings" })}
+                <Button variant="secondary" onClick={handleReset} stretch ariaLabel={intl.formatMessage(messages.resetAriaLabel)}>
+                    {intl.formatMessage(messages.reset)}
                 </Button>
             </Column>
         </Columns>
 
         <Accordion>
-          <AccordionItem title={intl.formatMessage({ defaultMessage: "Object", description: "Title for the Object settings section"})} defaultExpanded>
+          <AccordionItem title={intl.formatMessage(messages.object)} defaultExpanded>
             <Rows spacing="1.5u">
               <Rows spacing="0.5u">
-                <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Shape", description: "Label for the shape selection dropdown" })}</Text>
+                <Text size="small" tone="tertiary">{intl.formatMessage(messages.shape)}</Text>
                 <Select
                   value={shape}
                   options={[
-                    { value: "cube", label: intl.formatMessage({ defaultMessage: "Cube", description: "Cube shape option" }) },
-                    { value: "sphere", label: intl.formatMessage({ defaultMessage: "Sphere", description: "Sphere shape option" }) },
-                    { value: "cylinder", label: intl.formatMessage({ defaultMessage: "Cylinder", description: "Cylinder shape option" }) },
-                    { value: "donut", label: intl.formatMessage({ defaultMessage: "Donut", description: "Donut shape option" }) },
-                    { value: "cone", label: intl.formatMessage({ defaultMessage: "Cone", description: "Cone shape option" }) },
-                    { value: "torusKnot", label: intl.formatMessage({ defaultMessage: "Knot", description: "Torus Knot shape option" }) },
-                    { value: "icosahedron", label: intl.formatMessage({ defaultMessage: "Icosahedron", description: "Icosahedron shape option" }) },
-                    { value: "dodecahedron", label: intl.formatMessage({ defaultMessage: "Dodecahedron", description: "Dodecahedron shape option" }) },
-                    { value: "vase", label: intl.formatMessage({ defaultMessage: "Vase", description: "Vase shape option" }) },
-                    { value: "capsule", label: intl.formatMessage({ defaultMessage: "Capsule", description: "Capsule shape option" }) },
-                    { value: "octahedron", label: intl.formatMessage({ defaultMessage: "Octahedron", description: "Octahedron shape option" }) },
-                    { value: "tetrahedron", label: intl.formatMessage({ defaultMessage: "Tetrahedron", description: "Tetrahedron shape option" }) },
+                    { value: "cube", label: intl.formatMessage(messages.cube) },
+                    { value: "sphere", label: intl.formatMessage(messages.sphere) },
+                    { value: "cylinder", label: intl.formatMessage(messages.cylinder) },
+                    { value: "donut", label: intl.formatMessage(messages.donut) },
+                    { value: "cone", label: intl.formatMessage(messages.cone) },
+                    { value: "torusKnot", label: intl.formatMessage(messages.torusKnot) },
+                    { value: "icosahedron", label: intl.formatMessage(messages.icosahedron) },
+                    { value: "dodecahedron", label: intl.formatMessage(messages.dodecahedron) },
+                    { value: "vase", label: intl.formatMessage(messages.vase) },
+                    { value: "capsule", label: intl.formatMessage(messages.capsule) },
+                    { value: "octahedron", label: intl.formatMessage(messages.octahedron) },
+                    { value: "tetrahedron", label: intl.formatMessage(messages.tetrahedron) },
                   ]}
                   onChange={(value) => setShape(value as Shape)}
                 />
               </Rows>
               <Rows spacing="0.5u">
-                <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Material", description: "Label for the material selection dropdown" })}</Text>
+                <Text size="small" tone="tertiary">{intl.formatMessage(messages.material)}</Text>
                 <Select
                   value={materialType}
                   options={[
-                    { value: "matte", label: intl.formatMessage({ defaultMessage: "Matte", description: "Matte material option" }) },
-                    { value: "plastic", label: intl.formatMessage({ defaultMessage: "Plastic", description: "Plastic material option" }) },
-                    { value: "metal", label: intl.formatMessage({ defaultMessage: "Metal", description: "Metal material option" }) },
-                    { value: "glass", label: intl.formatMessage({ defaultMessage: "Glass", description: "Glass material option" }) },
-                    { value: "porcelain", label: intl.formatMessage({ defaultMessage: "Porcelain", description: "Porcelain material option" }) },
-                    { value: "velvet", label: intl.formatMessage({ defaultMessage: "Velvet", description: "Velvet material option" }) },
-                    { value: "toon", label: intl.formatMessage({ defaultMessage: "Toon", description: "Toon material option" }) },
-                    { value: "lambert", label: intl.formatMessage({ defaultMessage: "Lambert", description: "Lambert material option" }) },
-                    { value: "normal", label: intl.formatMessage({ defaultMessage: "Normal", description: "Normal material option" }) },
-                    { value: "wireframe", label: intl.formatMessage({ defaultMessage: "Wireframe", description: "Wireframe material option" }) },
+                    { value: "matte", label: intl.formatMessage(messages.matte) },
+                    { value: "plastic", label: intl.formatMessage(messages.plastic) },
+                    { value: "metal", label: intl.formatMessage(messages.metal) },
+                    { value: "glass", label: intl.formatMessage(messages.glass) },
+                    { value: "porcelain", label: intl.formatMessage(messages.porcelain) },
+                    { value: "velvet", label: intl.formatMessage(messages.velvet) },
+                    { value: "toon", label: intl.formatMessage(messages.toon) },
+                    { value: "lambert", label: intl.formatMessage(messages.lambert) },
+                    { value: "normal", label: intl.formatMessage(messages.normal) },
+                    { value: "wireframe", label: intl.formatMessage(messages.wireframe) },
                   ]}
                   onChange={(value) => setMaterialType(value as MaterialType)}
                 />
               </Rows>
                <Checkbox
-                label={intl.formatMessage({ defaultMessage: "Wireframe Overlay", description: "Checkbox to toggle wireframe overlay" })}
+                label={intl.formatMessage(messages.wireframeOverlay)}
                 checked={wireframeOverlay}
                 onChange={(_, checked) => setWireframeOverlay(checked)}
               />
             </Rows>
           </AccordionItem>
 
-          <AccordionItem title={intl.formatMessage({ defaultMessage: "Rotation", description: "Title for the Rotation settings section"})}>
+          <AccordionItem title={intl.formatMessage(messages.rotation)}>
             <Rows spacing="1.5u">
               <Box>
-                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "X-Axis Rotation: {rotationX}°", description: "Label for the X-axis rotation slider" }, { rotationX })}</Text>
+                <Text size="xsmall">{intl.formatMessage(messages.rotationX, { rotationX })}</Text>
                 <Slider
                   value={rotationX}
                   min={0}
@@ -601,7 +604,7 @@ const App = () => {
                 />
               </Box>
               <Box>
-                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Y-Axis Rotation: {rotationY}°", description: "Label for the Y-axis rotation slider" }, { rotationY })}</Text>
+                <Text size="xsmall">{intl.formatMessage(messages.rotationY, { rotationY })}</Text>
                 <Slider
                   value={rotationY}
                   min={0}
@@ -610,7 +613,7 @@ const App = () => {
                 />
               </Box>
               <Box>
-                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Z-Axis Rotation: {rotationZ}°", description: "Label for the Z-axis rotation slider" }, { rotationZ })}</Text>
+                <Text size="xsmall">{intl.formatMessage(messages.rotationZ, { rotationZ })}</Text>
                 <Slider
                   value={rotationZ}
                   min={0}
@@ -621,10 +624,10 @@ const App = () => {
             </Rows>
           </AccordionItem>
 
-          <AccordionItem title={intl.formatMessage({ defaultMessage: "Deformations", description: "Title for the Deformations settings section"})}>
+          <AccordionItem title={intl.formatMessage(messages.deformations)}>
             <Rows spacing="1.5u">
               <Box>
-                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Twist: {twist}°", description: "Label for the twist slider" }, { twist })}</Text>
+                <Text size="xsmall">{intl.formatMessage(messages.twist, { twist })}</Text>
                 <Slider
                   value={twist}
                   min={-180}
@@ -633,7 +636,7 @@ const App = () => {
                 />
               </Box>
               <Box>
-                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Taper: {taper}", description: "Label for the taper slider" }, { taper: taper.toFixed(2) })}</Text>
+                <Text size="xsmall">{intl.formatMessage(messages.taper, { taper: taper.toFixed(2) })}</Text>
                 <Slider
                   value={taper}
                   min={-1}
@@ -643,7 +646,7 @@ const App = () => {
                 />
               </Box>
               <Box>
-                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Noise: {noise}", description: "Label for the noise slider" }, { noise: noise.toFixed(2) })}</Text>
+                <Text size="xsmall">{intl.formatMessage(messages.noise, { noise: noise.toFixed(2) })}</Text>
                 <Slider
                   value={noise}
                   min={0}
@@ -654,7 +657,7 @@ const App = () => {
               </Box>
               {shape === 'cube' && (
                 <Box>
-                  <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Roundness: {roundness}", description: "Label for the roundness slider" }, { roundness: roundness.toFixed(2) })}</Text>
+                  <Text size="xsmall">{intl.formatMessage(messages.roundness, { roundness: roundness.toFixed(2) })}</Text>
                   <Slider
                     value={roundness}
                     min={0}
@@ -666,7 +669,7 @@ const App = () => {
               )}
               {shape === 'donut' && (
                 <Box>
-                  <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Ring Thickness: {donutTube}", description: "Label for the donut tube slider" }, { donutTube: donutTube.toFixed(2) })}</Text>
+                  <Text size="xsmall">{intl.formatMessage(messages.donutTube, { donutTube: donutTube.toFixed(2) })}</Text>
                   <Slider
                     value={donutTube}
                     min={0.1}
@@ -679,7 +682,7 @@ const App = () => {
               {shape === 'torusKnot' && (
                 <>
                   <Box>
-                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "P-value: {knotP}", description: "Label for the knot P value slider" }, { knotP })}</Text>
+                    <Text size="xsmall">{intl.formatMessage(messages.knotP, { knotP })}</Text>
                     <Slider
                       value={knotP}
                       min={1}
@@ -689,7 +692,7 @@ const App = () => {
                     />
                   </Box>
                   <Box>
-                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Q-value: {knotQ}", description: "Label for the knot Q value slider" }, { knotQ })}</Text>
+                    <Text size="xsmall">{intl.formatMessage(messages.knotQ, { knotQ })}</Text>
                     <Slider
                       value={knotQ}
                       min={1}
@@ -703,12 +706,12 @@ const App = () => {
             </Rows>
           </AccordionItem>
 
-          <AccordionItem title={intl.formatMessage({ defaultMessage: "Lighting & Colors", description: "Title for the Lighting & Colors settings section"})}>
+          <AccordionItem title={intl.formatMessage(messages.lightingColors)}>
             <Rows spacing="1.5u">
               <Columns spacing="1u" align="center">
                 <Column>
                     <Rows spacing="0.5u">
-                        <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Main Color", description: "Label for the main color selector" })}</Text>
+                        <Text size="xsmall">{intl.formatMessage(messages.mainColor)}</Text>
                         <ColorSelector
                             color={mainColor}
                             onChange={setMainColor}
@@ -717,7 +720,7 @@ const App = () => {
                 </Column>
                 <Column>
                     <Rows spacing="0.5u">
-                        <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Shadow Tint", description: "Label for the shadow tint color selector" })}</Text>
+                        <Text size="xsmall">{intl.formatMessage(messages.shadowTint)}</Text>
                         <ColorSelector
                             color={shadowTint}
                             onChange={setShadowTint}
@@ -726,7 +729,7 @@ const App = () => {
                 </Column>
                 <Column>
                     <Rows spacing="0.5u">
-                        <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Light Color", description: "Label for the light color selector" })}</Text>
+                        <Text size="xsmall">{intl.formatMessage(messages.lightColor)}</Text>
                         <ColorSelector
                             color={lightColor}
                             onChange={setLightColor}
@@ -735,7 +738,7 @@ const App = () => {
                 </Column>
               </Columns>
               <Box>
-                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Shadow Intensity: {shadowIntensity}", description: "Label for the shadow intensity slider" }, { shadowIntensity: shadowIntensity.toFixed(2) })}</Text>
+                <Text size="xsmall">{intl.formatMessage(messages.shadowIntensity, { shadowIntensity: shadowIntensity.toFixed(2) })}</Text>
                 <Slider
                   value={shadowIntensity}
                   min={0}
@@ -745,7 +748,7 @@ const App = () => {
                 />
               </Box>
               <Box>
-                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Ambient Intensity: {ambientIntensity}", description: "Label for the ambient intensity slider" }, { ambientIntensity: ambientIntensity.toFixed(2) })}</Text>
+                <Text size="xsmall">{intl.formatMessage(messages.ambientIntensity, { ambientIntensity: ambientIntensity.toFixed(2) })}</Text>
                 <Slider
                   value={ambientIntensity}
                   min={0}
@@ -755,10 +758,10 @@ const App = () => {
                 />
               </Box>
               <Box>
-                <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Light Position", description: "Label for the light position sliders" })}</Text>
+                <Text size="small" tone="tertiary">{intl.formatMessage(messages.lightPosition)}</Text>
                 <Rows spacing="1u">
                    <Box>
-                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "X: {lightX}", description: "Label for the light X position slider" }, { lightX: lightX.toFixed(1) })}</Text>
+                    <Text size="xsmall">{intl.formatMessage(messages.lightX, { lightX: lightX.toFixed(1) })}</Text>
                     <Slider
                       value={lightX}
                       min={-20}
@@ -768,7 +771,7 @@ const App = () => {
                     />
                   </Box>
                   <Box>
-                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Y: {lightY}", description: "Label for the light Y position slider" }, { lightY: lightY.toFixed(1) })}</Text>
+                    <Text size="xsmall">{intl.formatMessage(messages.lightY, { lightY: lightY.toFixed(1) })}</Text>
                     <Slider
                       value={lightY}
                       min={-20}
@@ -778,7 +781,7 @@ const App = () => {
                     />
                   </Box>
                   <Box>
-                    <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Z: {lightZ}", description: "Label for the light Z position slider" }, { lightZ: lightZ.toFixed(1) })}</Text>
+                    <Text size="xsmall">{intl.formatMessage(messages.lightZ, { lightZ: lightZ.toFixed(1) })}</Text>
                     <Slider
                       value={lightZ}
                       min={-20}
@@ -790,21 +793,21 @@ const App = () => {
                 </Rows>
               </Box>
               <Checkbox
-                label={intl.formatMessage({ defaultMessage: "Transparent Background", description: "Checkbox to toggle transparent background" })}
+                label={intl.formatMessage(messages.transparentBackground)}
                 checked={isTransparent}
                 onChange={(_, checked) => setIsTransparent(checked)}
               />
               {!isTransparent && (
                 <Rows spacing="1u">
                     <Rows spacing="0.5u">
-                        <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Background Color", description: "Label for the background color selector" })}</Text>
+                        <Text size="xsmall">{intl.formatMessage(messages.backgroundColor)}</Text>
                         <ColorSelector
                             color={backgroundColor}
                             onChange={setBackgroundColor}
                         />
                     </Rows>
                      <Box>
-                        <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Opacity: {opacity}%", description: "Label for background opacity slider" }, { opacity: Math.round(backgroundOpacity * 100) })}</Text>
+                        <Text size="xsmall">{intl.formatMessage(messages.backgroundOpacity, { opacity: Math.round(backgroundOpacity * 100) })}</Text>
                         <Slider
                             value={backgroundOpacity}
                             min={0}
@@ -818,27 +821,27 @@ const App = () => {
             </Rows>
           </AccordionItem>
 
-           <AccordionItem title={intl.formatMessage({ defaultMessage: "Export Settings", description: "Title for the Export Settings section"})}>
+           <AccordionItem title={intl.formatMessage(messages.exportSettings)}>
             <Rows spacing="1.5u">
-              <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Export Size", description: "Label for the export size selection dropdown" })}</Text>
+              <Text size="small" tone="tertiary">{intl.formatMessage(messages.exportSize)}</Text>
               <Select
                 value={exportSize}
                 options={[
-                  { value: 512, label: intl.formatMessage({ defaultMessage: "512px", description: "Export size option 512px" }) },
-                  { value: 1024, label: intl.formatMessage({ defaultMessage: "1024px", description: "Export size option 1024px" }) },
-                  { value: 2048, label: intl.formatMessage({ defaultMessage: "2048px", description: "Export size option 2048px" }) },
-                  { value: 4096, label: intl.formatMessage({ defaultMessage: "4096px", description: "Export size option 4096px" }) },
+                  { value: 512, label: intl.formatMessage(messages.size512) },
+                  { value: 1024, label: intl.formatMessage(messages.size1024) },
+                  { value: 2048, label: intl.formatMessage(messages.size2048) },
+                  { value: 4096, label: intl.formatMessage(messages.size4096) },
                 ]}
                 onChange={(value) => setExportSize(value as number)}
               />
             </Rows>
           </AccordionItem>
 
-          <AccordionItem title={intl.formatMessage({ defaultMessage: "Keyboard Shortcuts", description: "Title for the Keyboard Shortcuts section"})}>
+          <AccordionItem title={intl.formatMessage(messages.keyboardShortcuts)}>
             <Rows spacing="1.5u">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Text size="xsmall">
-                  {intl.formatMessage({ defaultMessage: "Add to design:", description: "Shortcut description" })}
+                  {intl.formatMessage(messages.shortcutAddToDesign)}
                 </Text>
                 <span style={{
                   display: 'inline-flex',
@@ -850,12 +853,12 @@ const App = () => {
                   fontSize: 13,
                   color: 'var(--ui-kit-color-content-fg)',
                 }}>
-                  {intl.formatMessage({ defaultMessage: "Enter", description: "Keyboard key name" })}
+                  {intl.formatMessage(messages.keyEnter)}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Text size="xsmall">
-                  {intl.formatMessage({ defaultMessage: "Reset settings:", description: "Shortcut description" })}
+                  {intl.formatMessage(messages.shortcutReset)}
                 </Text>
                 <span style={{
                   display: 'inline-flex',
@@ -867,12 +870,12 @@ const App = () => {
                   fontSize: 13,
                   color: 'var(--ui-kit-color-content-fg)',
                 }}>
-                  {intl.formatMessage({ defaultMessage: "R", description: "Keyboard key name" })}
+                  {intl.formatMessage(messages.keyR)}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Text size="xsmall">
-                  {intl.formatMessage({ defaultMessage: "Cycle through shapes:", description: "Shortcut description" })}
+                  {intl.formatMessage(messages.shortcutCycleShapes)}
                 </Text>
                 <span style={{
                   display: 'inline-flex',
@@ -884,12 +887,12 @@ const App = () => {
                   fontSize: 13,
                   color: 'var(--ui-kit-color-content-fg)',
                 }}>
-                  {intl.formatMessage({ defaultMessage: "C", description: "Keyboard key name" })}
+                  {intl.formatMessage(messages.keyC)}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Text size="xsmall">
-                  {intl.formatMessage({ defaultMessage: "Cycle through materials:", description: "Shortcut description" })}
+                  {intl.formatMessage(messages.shortcutCycleMaterials)}
                 </Text>
                 <span style={{
                   display: 'inline-flex',
@@ -901,12 +904,12 @@ const App = () => {
                   fontSize: 13,
                   color: 'var(--ui-kit-color-content-fg)',
                 }}>
-                  {intl.formatMessage({ defaultMessage: "M", description: "Keyboard key name" })}
+                  {intl.formatMessage(messages.keyM)}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <Text size="xsmall">
-                  {intl.formatMessage({ defaultMessage: "Rotate X-axis:", description: "Shortcut description" })}
+                  {intl.formatMessage(messages.shortcutRotateX)}
                 </Text>
                 <span style={{
                   display: 'inline-flex',
@@ -918,7 +921,7 @@ const App = () => {
                   fontSize: 13,
                   color: 'var(--ui-kit-color-content-fg)',
                 }}>
-                  {intl.formatMessage({ defaultMessage: "Q", description: "Keyboard key name" })}
+                  {intl.formatMessage(messages.keyQ)}
                 </span>
                 <span style={{
                   display: 'inline-flex',
@@ -930,12 +933,12 @@ const App = () => {
                   fontSize: 13,
                   color: 'var(--ui-kit-color-content-fg)',
                 }}>
-                  {intl.formatMessage({ defaultMessage: "A", description: "Keyboard key name" })}
+                  {intl.formatMessage(messages.keyA)}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <Text size="xsmall">
-                  {intl.formatMessage({ defaultMessage: "Rotate Y-axis:", description: "Shortcut description" })}
+                  {intl.formatMessage(messages.shortcutRotateY)}
                 </Text>
                 <span style={{
                   display: 'inline-flex',
@@ -947,7 +950,7 @@ const App = () => {
                   fontSize: 13,
                   color: 'var(--ui-kit-color-content-fg)',
                 }}>
-                  {intl.formatMessage({ defaultMessage: "W", description: "Keyboard key name" })}
+                  {intl.formatMessage(messages.keyW)}
                 </span>
                 <span style={{
                   display: 'inline-flex',
@@ -959,12 +962,12 @@ const App = () => {
                   fontSize: 13,
                   color: 'var(--ui-kit-color-content-fg)',
                 }}>
-                  {intl.formatMessage({ defaultMessage: "S", description: "Keyboard key name" })}
+                  {intl.formatMessage(messages.keyS)}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <Text size="xsmall">
-                  {intl.formatMessage({ defaultMessage: "Rotate Z-axis:", description: "Shortcut description" })}
+                  {intl.formatMessage(messages.shortcutRotateZ)}
                 </Text>
                 <span style={{
                   display: 'inline-flex',
@@ -976,7 +979,7 @@ const App = () => {
                   fontSize: 13,
                   color: 'var(--ui-kit-color-content-fg)',
                 }}>
-                  {intl.formatMessage({ defaultMessage: "E", description: "Keyboard key name" })}
+                  {intl.formatMessage(messages.keyE)}
                 </span>
                 <span style={{
                   display: 'inline-flex',
@@ -988,12 +991,12 @@ const App = () => {
                   fontSize: 13,
                   color: 'var(--ui-kit-color-content-fg)',
                 }}>
-                  {intl.formatMessage({ defaultMessage: "D", description: "Keyboard key name" })}
+                  {intl.formatMessage(messages.keyD)}
                 </span>
               </div>
               <Box paddingTop="1u">
                 <Alert tone="info">
-                  {intl.formatMessage({ defaultMessage: "These keyboard shortcuts only work when the app is active.", description: "Info alert about shortcuts" })}
+                  {intl.formatMessage(messages.shortcutsInfo)}
                 </Alert>
               </Box>
             </Rows>
