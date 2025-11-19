@@ -1,16 +1,52 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as THREE from "three";
-import { RoundedBoxGeometry } from 'three-stdlib';
-import { Rows, Text, Select, Button, ColorSelector, Box, Slider, Columns, Column, Accordion, AccordionItem, Checkbox, Alert } from "@canva/app-ui-kit";
+import { RoundedBoxGeometry } from "three-stdlib";
+import {
+  Rows,
+  Text,
+  Select,
+  Button,
+  ColorSelector,
+  Box,
+  Slider,
+  Columns,
+  Column,
+  Accordion,
+  AccordionItem,
+  Checkbox,
+  Alert,
+} from "@canva/app-ui-kit";
 import { addElementAtPoint } from "@canva/design";
-import { useIntl, IntlShape } from "react-intl";
+import type { IntlShape } from "react-intl";
+import { useIntl } from "react-intl";
 import "styles/components.css";
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
-import venice_sunset from 'assets/hdr/venice_sunset_1k.hdr';
-import { messages } from './i18n/messages';
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
+import venice_sunset from "assets/hdr/venice_sunset_1k.hdr";
+import { messages } from "./i18n/messages";
 
-type Shape = "cube" | "sphere" | "cylinder" | "donut" | "cone" | "torusKnot" | "icosahedron" | "dodecahedron" | "capsule" | "octahedron" | "tetrahedron";
-type MaterialType = "matte" | "metal" | "glass" | "velvet" | "toon" | "wireframe" | "plastic" | "porcelain" | "normal" | "lambert";
+type Shape =
+  | "cube"
+  | "sphere"
+  | "cylinder"
+  | "donut"
+  | "cone"
+  | "torusKnot"
+  | "icosahedron"
+  | "dodecahedron"
+  | "capsule"
+  | "octahedron"
+  | "tetrahedron";
+type MaterialType =
+  | "matte"
+  | "metal"
+  | "glass"
+  | "velvet"
+  | "toon"
+  | "wireframe"
+  | "plastic"
+  | "porcelain"
+  | "normal"
+  | "lambert";
 
 const defaultState = {
   shape: "cube" as Shape,
@@ -72,12 +108,33 @@ interface ThreeSceneProps {
 }
 
 const ThreeScene: React.FC<ThreeSceneProps> = (props) => {
-  const { onSceneReady, getRenderer, getScene, getCamera, intl, ...rest } = props;
+  const { onSceneReady, getRenderer, getScene, getCamera, intl, ...rest } =
+    props;
   const {
-    shape, twist, roundness, taper, noise, rotationX, rotationY, rotationZ,
-    mainColor, shadowTint, lightColor, lightX, lightY, lightZ, shadowIntensity,
-    ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent,
-    backgroundColor, backgroundOpacity, wireframeOverlay
+    shape,
+    twist,
+    roundness,
+    taper,
+    noise,
+    rotationX,
+    rotationY,
+    rotationZ,
+    mainColor,
+    shadowTint,
+    lightColor,
+    lightX,
+    lightY,
+    lightZ,
+    shadowIntensity,
+    ambientIntensity,
+    materialType,
+    donutTube,
+    knotP,
+    knotQ,
+    isTransparent,
+    backgroundColor,
+    backgroundOpacity,
+    wireframeOverlay,
   } = rest;
 
   const mountRef = useRef<HTMLDivElement>(null);
@@ -149,60 +206,105 @@ const ThreeScene: React.FC<ThreeSceneProps> = (props) => {
       if (obj instanceof THREE.Mesh) {
         obj.geometry.dispose();
         if (Array.isArray(obj.material)) {
-          obj.material.forEach(material => material.dispose());
+          obj.material.forEach((material) => material.dispose());
         } else {
           obj.material.dispose();
         }
       }
       scene.remove(obj);
     }
-    
+
     if (isTransparent) {
-        renderer.setClearAlpha(0);
+      renderer.setClearAlpha(0);
     } else {
-        renderer.setClearColor(backgroundColor);
-        renderer.setClearAlpha(backgroundOpacity);
+      renderer.setClearColor(backgroundColor);
+      renderer.setClearAlpha(backgroundOpacity);
     }
 
     const ambientLight = new THREE.AmbientLight(lightColor, ambientIntensity);
     scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(new THREE.Color(lightColor), shadowIntensity);
+    const directionalLight = new THREE.DirectionalLight(
+      new THREE.Color(lightColor),
+      shadowIntensity,
+    );
     directionalLight.position.set(lightX, lightY, lightZ);
     scene.add(directionalLight);
 
     const createMesh = (geometry: THREE.BufferGeometry) => {
       let material: THREE.Material;
       switch (materialType) {
-        case 'metal':
-          material = new THREE.MeshStandardMaterial({ color: new THREE.Color(mainColor), roughness: 0.1, metalness: 0.9, emissive: new THREE.Color(shadowTint).multiplyScalar(0.1) });
+        case "metal":
+          material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(mainColor),
+            roughness: 0.1,
+            metalness: 0.9,
+            emissive: new THREE.Color(shadowTint).multiplyScalar(0.1),
+          });
           break;
-        case 'glass':
-          material = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(mainColor), roughness: 0, metalness: 0.1, transmission: 1.0, ior: 1.5, thickness: 1.0 });
+        case "glass":
+          material = new THREE.MeshPhysicalMaterial({
+            color: new THREE.Color(mainColor),
+            roughness: 0,
+            metalness: 0.1,
+            transmission: 1.0,
+            ior: 1.5,
+            thickness: 1.0,
+          });
           break;
-        case 'velvet':
-          material = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(mainColor), roughness: 1, metalness: 0.1, sheen: 0.7, sheenRoughness: 0.3, sheenColor: new THREE.Color(shadowTint) });
+        case "velvet":
+          material = new THREE.MeshPhysicalMaterial({
+            color: new THREE.Color(mainColor),
+            roughness: 1,
+            metalness: 0.1,
+            sheen: 0.7,
+            sheenRoughness: 0.3,
+            sheenColor: new THREE.Color(shadowTint),
+          });
           break;
-        case 'toon':
-          material = new THREE.MeshToonMaterial({ color: new THREE.Color(mainColor) });
+        case "toon":
+          material = new THREE.MeshToonMaterial({
+            color: new THREE.Color(mainColor),
+          });
           break;
-        case 'wireframe':
-          material = new THREE.MeshBasicMaterial({ color: new THREE.Color(mainColor), wireframe: true });
+        case "wireframe":
+          material = new THREE.MeshBasicMaterial({
+            color: new THREE.Color(mainColor),
+            wireframe: true,
+          });
           break;
-        case 'plastic':
-          material = new THREE.MeshStandardMaterial({ color: new THREE.Color(mainColor), roughness: 0.4, metalness: 0.05 });
+        case "plastic":
+          material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(mainColor),
+            roughness: 0.4,
+            metalness: 0.05,
+          });
           break;
-        case 'porcelain':
-          material = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(mainColor), roughness: 0.1, metalness: 0.1, transmission: 0.2, sheen: 0.5, sheenColor: new THREE.Color(shadowTint) });
+        case "porcelain":
+          material = new THREE.MeshPhysicalMaterial({
+            color: new THREE.Color(mainColor),
+            roughness: 0.1,
+            metalness: 0.1,
+            transmission: 0.2,
+            sheen: 0.5,
+            sheenColor: new THREE.Color(shadowTint),
+          });
           break;
-        case 'normal':
+        case "normal":
           material = new THREE.MeshNormalMaterial();
           break;
-        case 'lambert':
-          material = new THREE.MeshLambertMaterial({ color: new THREE.Color(mainColor) });
+        case "lambert":
+          material = new THREE.MeshLambertMaterial({
+            color: new THREE.Color(mainColor),
+          });
           break;
-        case 'matte':
+        case "matte":
         default:
-          material = new THREE.MeshStandardMaterial({ color: new THREE.Color(mainColor), roughness: 0.9, metalness: 0.1, emissive: new THREE.Color(shadowTint).multiplyScalar(0.2) });
+          material = new THREE.MeshStandardMaterial({
+            color: new THREE.Color(mainColor),
+            roughness: 0.9,
+            metalness: 0.1,
+            emissive: new THREE.Color(shadowTint).multiplyScalar(0.2),
+          });
           break;
       }
 
@@ -212,21 +314,21 @@ const ThreeScene: React.FC<ThreeSceneProps> = (props) => {
       mesh.rotation.set(
         THREE.MathUtils.degToRad(rotationX),
         THREE.MathUtils.degToRad(rotationY),
-        THREE.MathUtils.degToRad(rotationZ)
+        THREE.MathUtils.degToRad(rotationZ),
       );
 
       geometry.computeBoundingBox();
       const bbox = geometry.boundingBox as THREE.Box3;
       const height = bbox.max.y - bbox.min.y;
 
-      const positionAttribute = mesh.geometry.getAttribute('position');
+      const positionAttribute = mesh.geometry.getAttribute("position");
       const vertex = new THREE.Vector3();
       for (let i = 0; i < positionAttribute.count; i++) {
         vertex.fromBufferAttribute(positionAttribute, i);
-        
+
         const normalizedY = height > 0 ? (vertex.y - bbox.min.y) / height : 0;
 
-        const taperAmount = 1.0 - (normalizedY * taper);
+        const taperAmount = 1.0 - normalizedY * taper;
         vertex.x *= taperAmount;
         vertex.z *= taperAmount;
 
@@ -237,7 +339,7 @@ const ThreeScene: React.FC<ThreeSceneProps> = (props) => {
           vertex.z += noiseAmount;
         }
 
-        const twistAngle = vertex.y * (twist * Math.PI / 180);
+        const twistAngle = vertex.y * ((twist * Math.PI) / 180);
         const sin = Math.sin(twistAngle);
         const cos = Math.cos(twistAngle);
         const x = vertex.x * cos - vertex.z * sin;
@@ -270,7 +372,14 @@ const ThreeScene: React.FC<ThreeSceneProps> = (props) => {
         geometry = new THREE.ConeGeometry(1, 2, 64);
         break;
       case "torusKnot":
-        geometry = new THREE.TorusKnotGeometry(0.8, 0.25, 100, 16, knotP, knotQ);
+        geometry = new THREE.TorusKnotGeometry(
+          0.8,
+          0.25,
+          100,
+          16,
+          knotP,
+          knotQ,
+        );
         break;
       case "icosahedron":
         geometry = new THREE.IcosahedronGeometry(1.2, 0);
@@ -296,19 +405,19 @@ const ThreeScene: React.FC<ThreeSceneProps> = (props) => {
     }
 
     if (wireframeOverlay) {
-        const wireframeMaterial = new THREE.MeshBasicMaterial({
-            color: 0x000000,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.5,
-        });
-        const wireframeMesh = new THREE.Mesh(geometry, wireframeMaterial);
-        wireframeMesh.rotation.set(
-          THREE.MathUtils.degToRad(rotationX),
-          THREE.MathUtils.degToRad(rotationY),
-          THREE.MathUtils.degToRad(rotationZ)
-        );
-        scene.add(wireframeMesh);
+      const wireframeMaterial = new THREE.MeshBasicMaterial({
+        color: 0x000000,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.5,
+      });
+      const wireframeMesh = new THREE.Mesh(geometry, wireframeMaterial);
+      wireframeMesh.rotation.set(
+        THREE.MathUtils.degToRad(rotationX),
+        THREE.MathUtils.degToRad(rotationY),
+        THREE.MathUtils.degToRad(rotationZ),
+      );
+      scene.add(wireframeMesh);
     }
 
     camera.position.set(0, 1, 5);
@@ -316,13 +425,40 @@ const ThreeScene: React.FC<ThreeSceneProps> = (props) => {
 
     renderer.render(scene, camera);
   }, [
-    shape, twist, roundness, taper, noise, rotationX, rotationY, rotationZ,
-    mainColor, shadowTint, lightColor, lightX, lightY, lightZ, shadowIntensity,
-    ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent,
-    backgroundColor, backgroundOpacity, wireframeOverlay
+    shape,
+    twist,
+    roundness,
+    taper,
+    noise,
+    rotationX,
+    rotationY,
+    rotationZ,
+    mainColor,
+    shadowTint,
+    lightColor,
+    lightX,
+    lightY,
+    lightZ,
+    shadowIntensity,
+    ambientIntensity,
+    materialType,
+    donutTube,
+    knotP,
+    knotQ,
+    isTransparent,
+    backgroundColor,
+    backgroundOpacity,
+    wireframeOverlay,
   ]);
 
-  return <div ref={mountRef} className="renderPreview" role="img" aria-label={intl.formatMessage(messages.renderPreviewAriaLabel)} />;
+  return (
+    <div
+      ref={mountRef}
+      className="renderPreview"
+      role="img"
+      aria-label={intl.formatMessage(messages.renderPreviewAriaLabel)}
+    />
+  );
 };
 
 const App = () => {
@@ -341,16 +477,30 @@ const App = () => {
   const [lightX, setLightX] = useState(defaultState.lightX);
   const [lightY, setLightY] = useState(defaultState.lightY);
   const [lightZ, setLightZ] = useState(defaultState.lightZ);
-  const [shadowIntensity, setShadowIntensity] = useState(defaultState.shadowIntensity);
-  const [ambientIntensity, setAmbientIntensity] = useState(defaultState.ambientIntensity);
-  const [materialType, setMaterialType] = useState<MaterialType>(defaultState.materialType);
+  const [shadowIntensity, setShadowIntensity] = useState(
+    defaultState.shadowIntensity,
+  );
+  const [ambientIntensity, setAmbientIntensity] = useState(
+    defaultState.ambientIntensity,
+  );
+  const [materialType, setMaterialType] = useState<MaterialType>(
+    defaultState.materialType,
+  );
   const [donutTube, setDonutTube] = useState(defaultState.donutTube);
   const [knotP, setKnotP] = useState(defaultState.knotP);
   const [knotQ, setKnotQ] = useState(defaultState.knotQ);
-  const [isTransparent, setIsTransparent] = useState(defaultState.isTransparent);
-  const [backgroundColor, setBackgroundColor] = useState(defaultState.backgroundColor);
-  const [backgroundOpacity, setBackgroundOpacity] = useState(defaultState.backgroundOpacity);
-  const [wireframeOverlay, setWireframeOverlay] = useState(defaultState.wireframeOverlay);
+  const [isTransparent, setIsTransparent] = useState(
+    defaultState.isTransparent,
+  );
+  const [backgroundColor, setBackgroundColor] = useState(
+    defaultState.backgroundColor,
+  );
+  const [backgroundOpacity, setBackgroundOpacity] = useState(
+    defaultState.backgroundOpacity,
+  );
+  const [wireframeOverlay, setWireframeOverlay] = useState(
+    defaultState.wireframeOverlay,
+  );
   const [exportSize, setExportSize] = useState(1024);
   const [isSceneReady, setIsSceneReady] = useState(false);
 
@@ -358,60 +508,88 @@ const App = () => {
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
 
-  const shapes: Shape[] = ["cube", "sphere", "cylinder", "donut", "cone", "torusKnot", "icosahedron", "dodecahedron", "capsule", "octahedron", "tetrahedron"];
-  const materials: MaterialType[] = ["matte", "plastic", "metal", "glass", "porcelain", "velvet", "toon", "lambert", "normal", "wireframe"];
+  const shapes: Shape[] = [
+    "cube",
+    "sphere",
+    "cylinder",
+    "donut",
+    "cone",
+    "torusKnot",
+    "icosahedron",
+    "dodecahedron",
+    "capsule",
+    "octahedron",
+    "tetrahedron",
+  ];
+  const materials: MaterialType[] = [
+    "matte",
+    "plastic",
+    "metal",
+    "glass",
+    "porcelain",
+    "velvet",
+    "toon",
+    "lambert",
+    "normal",
+    "wireframe",
+  ];
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       switch (event.key.toLowerCase()) {
-        case 'enter':
+        case "enter":
           event.preventDefault();
           addToCanva();
           break;
-        case 'r':
+        case "r":
           event.preventDefault();
           handleReset();
           break;
-        case 'c':
+        case "c":
           event.preventDefault();
-          setShape(prev => shapes[(shapes.indexOf(prev) + 1) % shapes.length]);
+          setShape(
+            (prev) => shapes[(shapes.indexOf(prev) + 1) % shapes.length],
+          );
           break;
-        case 'm':
+        case "m":
           event.preventDefault();
-          setMaterialType(prev => materials[(materials.indexOf(prev) + 1) % materials.length]);
+          setMaterialType(
+            (prev) =>
+              materials[(materials.indexOf(prev) + 1) % materials.length],
+          );
           break;
-        case 'q':
+        case "q":
           event.preventDefault();
-          setRotationX(prev => (prev + 5) % 360);
+          setRotationX((prev) => (prev + 5) % 360);
           break;
-        case 'a':
+        case "a":
           event.preventDefault();
-          setRotationX(prev => (prev - 5 + 360) % 360);
+          setRotationX((prev) => (prev - 5 + 360) % 360);
           break;
-        case 'w':
+        case "w":
           event.preventDefault();
-          setRotationY(prev => (prev + 5) % 360);
+          setRotationY((prev) => (prev + 5) % 360);
           break;
-        case 's':
+        case "s":
           event.preventDefault();
-          setRotationY(prev => (prev - 5 + 360) % 360);
+          setRotationY((prev) => (prev - 5 + 360) % 360);
           break;
-        case 'e':
+        case "e":
           event.preventDefault();
-          setRotationZ(prev => (prev + 5) % 360);
+          setRotationZ((prev) => (prev + 5) % 360);
           break;
-        case 'd':
+        case "d":
           event.preventDefault();
-          setRotationZ(prev => (prev - 5 + 360) % 360);
+          setRotationZ((prev) => (prev - 5 + 360) % 360);
           break;
         default:
           break;
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [shapes, materials]);
 
@@ -427,8 +605,11 @@ const App = () => {
     // Temporarily resize for export
     const originalSize = new THREE.Vector2();
     renderer.getSize(originalSize);
-    const originalStyle = { width: canvas.style.width, height: canvas.style.height };
-    
+    const originalStyle = {
+      width: canvas.style.width,
+      height: canvas.style.height,
+    };
+
     renderer.setSize(exportSize, exportSize);
     canvas.style.width = `${exportSize}px`;
     canvas.style.height = `${exportSize}px`;
@@ -449,7 +630,13 @@ const App = () => {
       height: 328,
       top: 100,
       left: 100,
-      altText: { text: intl.formatMessage({defaultMessage: "A 3D rendered object", description: "Alt text for the exported image"}), decorative: false },
+      altText: {
+        text: intl.formatMessage({
+          defaultMessage: "A 3D rendered object",
+          description: "Alt text for the exported image",
+        }),
+        decorative: false,
+      },
     });
   };
 
@@ -481,7 +668,7 @@ const App = () => {
   };
 
   return (
-    <div className="container" style={{ padding: '16px' }}>
+    <div className="container" style={{ padding: "16px" }}>
       <Rows spacing="1u">
         <Box>
           <ThreeScene
@@ -516,66 +703,138 @@ const App = () => {
             intl={intl}
           />
         </Box>
-        
+
         <Columns spacing="1u">
-            <Column>
-                <Button variant="primary" onClick={addToCanva} stretch disabled={!isSceneReady} loading={!isSceneReady} ariaLabel={intl.formatMessage(messages.addToCanvaAriaLabel)}>
-                    {isSceneReady
-                        ? intl.formatMessage(messages.addToCanva)
-                        : intl.formatMessage(messages.loadingScene)
-                    }
-                </Button>
-            </Column>
-            <Column>
-                <Button variant="secondary" onClick={handleReset} stretch ariaLabel={intl.formatMessage(messages.resetAriaLabel)}>
-                    {intl.formatMessage(messages.reset)}
-                </Button>
-            </Column>
+          <Column>
+            <Button
+              variant="primary"
+              onClick={addToCanva}
+              stretch
+              disabled={!isSceneReady}
+              loading={!isSceneReady}
+              ariaLabel={intl.formatMessage(messages.addToCanvaAriaLabel)}
+            >
+              {isSceneReady
+                ? intl.formatMessage(messages.addToCanva)
+                : intl.formatMessage(messages.loadingScene)}
+            </Button>
+          </Column>
+          <Column>
+            <Button
+              variant="secondary"
+              onClick={handleReset}
+              stretch
+              ariaLabel={intl.formatMessage(messages.resetAriaLabel)}
+            >
+              {intl.formatMessage(messages.reset)}
+            </Button>
+          </Column>
         </Columns>
 
         <Accordion>
-          <AccordionItem title={intl.formatMessage(messages.object)} defaultExpanded>
+          <AccordionItem
+            title={intl.formatMessage(messages.object)}
+            defaultExpanded
+          >
             <Rows spacing="1.5u">
               <Rows spacing="0.5u">
-                <Text size="small" tone="tertiary">{intl.formatMessage(messages.shape)}</Text>
+                <Text size="small" tone="tertiary">
+                  {intl.formatMessage(messages.shape)}
+                </Text>
                 <Select
                   value={shape}
                   options={[
                     { value: "cube", label: intl.formatMessage(messages.cube) },
-                    { value: "sphere", label: intl.formatMessage(messages.sphere) },
-                    { value: "cylinder", label: intl.formatMessage(messages.cylinder) },
-                    { value: "donut", label: intl.formatMessage(messages.donut) },
+                    {
+                      value: "sphere",
+                      label: intl.formatMessage(messages.sphere),
+                    },
+                    {
+                      value: "cylinder",
+                      label: intl.formatMessage(messages.cylinder),
+                    },
+                    {
+                      value: "donut",
+                      label: intl.formatMessage(messages.donut),
+                    },
                     { value: "cone", label: intl.formatMessage(messages.cone) },
-                    { value: "torusKnot", label: intl.formatMessage(messages.torusKnot) },
-                    { value: "icosahedron", label: intl.formatMessage(messages.icosahedron) },
-                    { value: "dodecahedron", label: intl.formatMessage(messages.dodecahedron) },
-                    { value: "capsule", label: intl.formatMessage(messages.capsule) },
-                    { value: "octahedron", label: intl.formatMessage(messages.octahedron) },
-                    { value: "tetrahedron", label: intl.formatMessage(messages.tetrahedron) },
+                    {
+                      value: "torusKnot",
+                      label: intl.formatMessage(messages.torusKnot),
+                    },
+                    {
+                      value: "icosahedron",
+                      label: intl.formatMessage(messages.icosahedron),
+                    },
+                    {
+                      value: "dodecahedron",
+                      label: intl.formatMessage(messages.dodecahedron),
+                    },
+                    {
+                      value: "capsule",
+                      label: intl.formatMessage(messages.capsule),
+                    },
+                    {
+                      value: "octahedron",
+                      label: intl.formatMessage(messages.octahedron),
+                    },
+                    {
+                      value: "tetrahedron",
+                      label: intl.formatMessage(messages.tetrahedron),
+                    },
                   ]}
                   onChange={(value) => setShape(value as Shape)}
                 />
               </Rows>
               <Rows spacing="0.5u">
-                <Text size="small" tone="tertiary">{intl.formatMessage(messages.material)}</Text>
+                <Text size="small" tone="tertiary">
+                  {intl.formatMessage(messages.material)}
+                </Text>
                 <Select
                   value={materialType}
                   options={[
-                    { value: "matte", label: intl.formatMessage(messages.matte) },
-                    { value: "plastic", label: intl.formatMessage(messages.plastic) },
-                    { value: "metal", label: intl.formatMessage(messages.metal) },
-                    { value: "glass", label: intl.formatMessage(messages.glass) },
-                    { value: "porcelain", label: intl.formatMessage(messages.porcelain) },
-                    { value: "velvet", label: intl.formatMessage(messages.velvet) },
+                    {
+                      value: "matte",
+                      label: intl.formatMessage(messages.matte),
+                    },
+                    {
+                      value: "plastic",
+                      label: intl.formatMessage(messages.plastic),
+                    },
+                    {
+                      value: "metal",
+                      label: intl.formatMessage(messages.metal),
+                    },
+                    {
+                      value: "glass",
+                      label: intl.formatMessage(messages.glass),
+                    },
+                    {
+                      value: "porcelain",
+                      label: intl.formatMessage(messages.porcelain),
+                    },
+                    {
+                      value: "velvet",
+                      label: intl.formatMessage(messages.velvet),
+                    },
                     { value: "toon", label: intl.formatMessage(messages.toon) },
-                    { value: "lambert", label: intl.formatMessage(messages.lambert) },
-                    { value: "normal", label: intl.formatMessage(messages.normal) },
-                    { value: "wireframe", label: intl.formatMessage(messages.wireframe) },
+                    {
+                      value: "lambert",
+                      label: intl.formatMessage(messages.lambert),
+                    },
+                    {
+                      value: "normal",
+                      label: intl.formatMessage(messages.normal),
+                    },
+                    {
+                      value: "wireframe",
+                      label: intl.formatMessage(messages.wireframe),
+                    },
                   ]}
                   onChange={(value) => setMaterialType(value as MaterialType)}
                 />
               </Rows>
-               <Checkbox
+              <Checkbox
                 label={intl.formatMessage(messages.wireframeOverlay)}
                 checked={wireframeOverlay}
                 onChange={(_, checked) => setWireframeOverlay(checked)}
@@ -586,7 +845,9 @@ const App = () => {
           <AccordionItem title={intl.formatMessage(messages.rotation)}>
             <Rows spacing="1.5u">
               <Box>
-                <Text size="xsmall">{intl.formatMessage(messages.rotationX, { rotationX })}</Text>
+                <Text size="xsmall">
+                  {intl.formatMessage(messages.rotationX, { rotationX })}
+                </Text>
                 <Slider
                   value={rotationX}
                   min={0}
@@ -595,7 +856,9 @@ const App = () => {
                 />
               </Box>
               <Box>
-                <Text size="xsmall">{intl.formatMessage(messages.rotationY, { rotationY })}</Text>
+                <Text size="xsmall">
+                  {intl.formatMessage(messages.rotationY, { rotationY })}
+                </Text>
                 <Slider
                   value={rotationY}
                   min={0}
@@ -604,7 +867,9 @@ const App = () => {
                 />
               </Box>
               <Box>
-                <Text size="xsmall">{intl.formatMessage(messages.rotationZ, { rotationZ })}</Text>
+                <Text size="xsmall">
+                  {intl.formatMessage(messages.rotationZ, { rotationZ })}
+                </Text>
                 <Slider
                   value={rotationZ}
                   min={0}
@@ -618,7 +883,9 @@ const App = () => {
           <AccordionItem title={intl.formatMessage(messages.deformations)}>
             <Rows spacing="1.5u">
               <Box>
-                <Text size="xsmall">{intl.formatMessage(messages.twist, { twist })}</Text>
+                <Text size="xsmall">
+                  {intl.formatMessage(messages.twist, { twist })}
+                </Text>
                 <Slider
                   value={twist}
                   min={-180}
@@ -627,7 +894,11 @@ const App = () => {
                 />
               </Box>
               <Box>
-                <Text size="xsmall">{intl.formatMessage(messages.taper, { taper: taper.toFixed(2) })}</Text>
+                <Text size="xsmall">
+                  {intl.formatMessage(messages.taper, {
+                    taper: taper.toFixed(2),
+                  })}
+                </Text>
                 <Slider
                   value={taper}
                   min={-1}
@@ -637,7 +908,11 @@ const App = () => {
                 />
               </Box>
               <Box>
-                <Text size="xsmall">{intl.formatMessage(messages.noise, { noise: noise.toFixed(2) })}</Text>
+                <Text size="xsmall">
+                  {intl.formatMessage(messages.noise, {
+                    noise: noise.toFixed(2),
+                  })}
+                </Text>
                 <Slider
                   value={noise}
                   min={0}
@@ -646,9 +921,13 @@ const App = () => {
                   onChange={setNoise}
                 />
               </Box>
-              {shape === 'cube' && (
+              {shape === "cube" && (
                 <Box>
-                  <Text size="xsmall">{intl.formatMessage(messages.roundness, { roundness: roundness.toFixed(2) })}</Text>
+                  <Text size="xsmall">
+                    {intl.formatMessage(messages.roundness, {
+                      roundness: roundness.toFixed(2),
+                    })}
+                  </Text>
                   <Slider
                     value={roundness}
                     min={0}
@@ -658,9 +937,13 @@ const App = () => {
                   />
                 </Box>
               )}
-              {shape === 'donut' && (
+              {shape === "donut" && (
                 <Box>
-                  <Text size="xsmall">{intl.formatMessage(messages.donutTube, { donutTube: donutTube.toFixed(2) })}</Text>
+                  <Text size="xsmall">
+                    {intl.formatMessage(messages.donutTube, {
+                      donutTube: donutTube.toFixed(2),
+                    })}
+                  </Text>
                   <Slider
                     value={donutTube}
                     min={0.1}
@@ -670,10 +953,12 @@ const App = () => {
                   />
                 </Box>
               )}
-              {shape === 'torusKnot' && (
+              {shape === "torusKnot" && (
                 <>
                   <Box>
-                    <Text size="xsmall">{intl.formatMessage(messages.knotP, { knotP })}</Text>
+                    <Text size="xsmall">
+                      {intl.formatMessage(messages.knotP, { knotP })}
+                    </Text>
                     <Slider
                       value={knotP}
                       min={1}
@@ -683,7 +968,9 @@ const App = () => {
                     />
                   </Box>
                   <Box>
-                    <Text size="xsmall">{intl.formatMessage(messages.knotQ, { knotQ })}</Text>
+                    <Text size="xsmall">
+                      {intl.formatMessage(messages.knotQ, { knotQ })}
+                    </Text>
                     <Slider
                       value={knotQ}
                       min={1}
@@ -701,35 +988,42 @@ const App = () => {
             <Rows spacing="1.5u">
               <Columns spacing="1u" align="center">
                 <Column>
-                    <Rows spacing="0.5u">
-                        <Text size="xsmall">{intl.formatMessage(messages.mainColor)}</Text>
-                        <ColorSelector
-                            color={mainColor}
-                            onChange={setMainColor}
-                        />
-                    </Rows>
+                  <Rows spacing="0.5u">
+                    <Text size="xsmall">
+                      {intl.formatMessage(messages.mainColor)}
+                    </Text>
+                    <ColorSelector color={mainColor} onChange={setMainColor} />
+                  </Rows>
                 </Column>
                 <Column>
-                    <Rows spacing="0.5u">
-                        <Text size="xsmall">{intl.formatMessage(messages.shadowTint)}</Text>
-                        <ColorSelector
-                            color={shadowTint}
-                            onChange={setShadowTint}
-                        />
-                    </Rows>
+                  <Rows spacing="0.5u">
+                    <Text size="xsmall">
+                      {intl.formatMessage(messages.shadowTint)}
+                    </Text>
+                    <ColorSelector
+                      color={shadowTint}
+                      onChange={setShadowTint}
+                    />
+                  </Rows>
                 </Column>
                 <Column>
-                    <Rows spacing="0.5u">
-                        <Text size="xsmall">{intl.formatMessage(messages.lightColor)}</Text>
-                        <ColorSelector
-                            color={lightColor}
-                            onChange={setLightColor}
-                        />
-                    </Rows>
+                  <Rows spacing="0.5u">
+                    <Text size="xsmall">
+                      {intl.formatMessage(messages.lightColor)}
+                    </Text>
+                    <ColorSelector
+                      color={lightColor}
+                      onChange={setLightColor}
+                    />
+                  </Rows>
                 </Column>
               </Columns>
               <Box>
-                <Text size="xsmall">{intl.formatMessage(messages.shadowIntensity, { shadowIntensity: shadowIntensity.toFixed(2) })}</Text>
+                <Text size="xsmall">
+                  {intl.formatMessage(messages.shadowIntensity, {
+                    shadowIntensity: shadowIntensity.toFixed(2),
+                  })}
+                </Text>
                 <Slider
                   value={shadowIntensity}
                   min={0}
@@ -739,7 +1033,11 @@ const App = () => {
                 />
               </Box>
               <Box>
-                <Text size="xsmall">{intl.formatMessage(messages.ambientIntensity, { ambientIntensity: ambientIntensity.toFixed(2) })}</Text>
+                <Text size="xsmall">
+                  {intl.formatMessage(messages.ambientIntensity, {
+                    ambientIntensity: ambientIntensity.toFixed(2),
+                  })}
+                </Text>
                 <Slider
                   value={ambientIntensity}
                   min={0}
@@ -749,10 +1047,16 @@ const App = () => {
                 />
               </Box>
               <Box>
-                <Text size="small" tone="tertiary">{intl.formatMessage(messages.lightPosition)}</Text>
+                <Text size="small" tone="tertiary">
+                  {intl.formatMessage(messages.lightPosition)}
+                </Text>
                 <Rows spacing="1u">
-                   <Box>
-                    <Text size="xsmall">{intl.formatMessage(messages.lightX, { lightX: lightX.toFixed(1) })}</Text>
+                  <Box>
+                    <Text size="xsmall">
+                      {intl.formatMessage(messages.lightX, {
+                        lightX: lightX.toFixed(1),
+                      })}
+                    </Text>
                     <Slider
                       value={lightX}
                       min={-20}
@@ -762,7 +1066,11 @@ const App = () => {
                     />
                   </Box>
                   <Box>
-                    <Text size="xsmall">{intl.formatMessage(messages.lightY, { lightY: lightY.toFixed(1) })}</Text>
+                    <Text size="xsmall">
+                      {intl.formatMessage(messages.lightY, {
+                        lightY: lightY.toFixed(1),
+                      })}
+                    </Text>
                     <Slider
                       value={lightY}
                       min={-20}
@@ -772,7 +1080,11 @@ const App = () => {
                     />
                   </Box>
                   <Box>
-                    <Text size="xsmall">{intl.formatMessage(messages.lightZ, { lightZ: lightZ.toFixed(1) })}</Text>
+                    <Text size="xsmall">
+                      {intl.formatMessage(messages.lightZ, {
+                        lightZ: lightZ.toFixed(1),
+                      })}
+                    </Text>
                     <Slider
                       value={lightZ}
                       min={-20}
@@ -790,31 +1102,39 @@ const App = () => {
               />
               {!isTransparent && (
                 <Rows spacing="1u">
-                    <Rows spacing="0.5u">
-                        <Text size="xsmall">{intl.formatMessage(messages.backgroundColor)}</Text>
-                        <ColorSelector
-                            color={backgroundColor}
-                            onChange={setBackgroundColor}
-                        />
-                    </Rows>
-                     <Box>
-                        <Text size="xsmall">{intl.formatMessage(messages.backgroundOpacity, { opacity: Math.round(backgroundOpacity * 100) })}</Text>
-                        <Slider
-                            value={backgroundOpacity}
-                            min={0}
-                            max={1}
-                            step={0.01}
-                            onChange={setBackgroundOpacity}
-                        />
-                    </Box>
+                  <Rows spacing="0.5u">
+                    <Text size="xsmall">
+                      {intl.formatMessage(messages.backgroundColor)}
+                    </Text>
+                    <ColorSelector
+                      color={backgroundColor}
+                      onChange={setBackgroundColor}
+                    />
+                  </Rows>
+                  <Box>
+                    <Text size="xsmall">
+                      {intl.formatMessage(messages.backgroundOpacity, {
+                        opacity: Math.round(backgroundOpacity * 100),
+                      })}
+                    </Text>
+                    <Slider
+                      value={backgroundOpacity}
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      onChange={setBackgroundOpacity}
+                    />
+                  </Box>
                 </Rows>
               )}
             </Rows>
           </AccordionItem>
 
-           <AccordionItem title={intl.formatMessage(messages.exportSettings)}>
+          <AccordionItem title={intl.formatMessage(messages.exportSettings)}>
             <Rows spacing="1.5u">
-              <Text size="small" tone="tertiary">{intl.formatMessage(messages.exportSize)}</Text>
+              <Text size="small" tone="tertiary">
+                {intl.formatMessage(messages.exportSize)}
+              </Text>
               <Select
                 value={exportSize}
                 options={[
@@ -830,158 +1150,217 @@ const App = () => {
 
           <AccordionItem title={intl.formatMessage(messages.keyboardShortcuts)}>
             <Rows spacing="1.5u">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
                 <Text size="xsmall">
                   {intl.formatMessage(messages.shortcutAddToDesign)}
                 </Text>
-                <span style={{
-                  display: 'inline-flex',
-                  padding: '2px 6px',
-                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
-                  border: '1px solid var(--ui-kit-color-ui-border)',
-                  borderRadius: 6,
-                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
-                  fontSize: 13,
-                  color: 'var(--ui-kit-color-content-fg)',
-                }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    padding: "2px 6px",
+                    background: "var(--ui-kit-color-ui-neutral-strong-bg)",
+                    border: "1px solid var(--ui-kit-color-ui-border)",
+                    borderRadius: 6,
+                    fontFamily:
+                      "var(--ui-kit-typography-font-family-monospace)",
+                    fontSize: 13,
+                    color: "var(--ui-kit-color-content-fg)",
+                  }}
+                >
                   {intl.formatMessage(messages.keyEnter)}
                 </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
                 <Text size="xsmall">
                   {intl.formatMessage(messages.shortcutReset)}
                 </Text>
-                <span style={{
-                  display: 'inline-flex',
-                  padding: '2px 6px',
-                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
-                  border: '1px solid var(--ui-kit-color-ui-border)',
-                  borderRadius: 6,
-                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
-                  fontSize: 13,
-                  color: 'var(--ui-kit-color-content-fg)',
-                }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    padding: "2px 6px",
+                    background: "var(--ui-kit-color-ui-neutral-strong-bg)",
+                    border: "1px solid var(--ui-kit-color-ui-border)",
+                    borderRadius: 6,
+                    fontFamily:
+                      "var(--ui-kit-typography-font-family-monospace)",
+                    fontSize: 13,
+                    color: "var(--ui-kit-color-content-fg)",
+                  }}
+                >
                   {intl.formatMessage(messages.keyR)}
                 </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
                 <Text size="xsmall">
                   {intl.formatMessage(messages.shortcutCycleShapes)}
                 </Text>
-                <span style={{
-                  display: 'inline-flex',
-                  padding: '2px 6px',
-                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
-                  border: '1px solid var(--ui-kit-color-ui-border)',
-                  borderRadius: 6,
-                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
-                  fontSize: 13,
-                  color: 'var(--ui-kit-color-content-fg)',
-                }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    padding: "2px 6px",
+                    background: "var(--ui-kit-color-ui-neutral-strong-bg)",
+                    border: "1px solid var(--ui-kit-color-ui-border)",
+                    borderRadius: 6,
+                    fontFamily:
+                      "var(--ui-kit-typography-font-family-monospace)",
+                    fontSize: 13,
+                    color: "var(--ui-kit-color-content-fg)",
+                  }}
+                >
                   {intl.formatMessage(messages.keyC)}
                 </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
                 <Text size="xsmall">
                   {intl.formatMessage(messages.shortcutCycleMaterials)}
                 </Text>
-                <span style={{
-                  display: 'inline-flex',
-                  padding: '2px 6px',
-                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
-                  border: '1px solid var(--ui-kit-color-ui-border)',
-                  borderRadius: 6,
-                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
-                  fontSize: 13,
-                  color: 'var(--ui-kit-color-content-fg)',
-                }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    padding: "2px 6px",
+                    background: "var(--ui-kit-color-ui-neutral-strong-bg)",
+                    border: "1px solid var(--ui-kit-color-ui-border)",
+                    borderRadius: 6,
+                    fontFamily:
+                      "var(--ui-kit-typography-font-family-monospace)",
+                    fontSize: 13,
+                    color: "var(--ui-kit-color-content-fg)",
+                  }}
+                >
                   {intl.formatMessage(messages.keyM)}
                 </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  flexWrap: "wrap",
+                }}
+              >
                 <Text size="xsmall">
                   {intl.formatMessage(messages.shortcutRotateX)}
                 </Text>
-                <span style={{
-                  display: 'inline-flex',
-                  padding: '2px 6px',
-                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
-                  border: '1px solid var(--ui-kit-color-ui-border)',
-                  borderRadius: 6,
-                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
-                  fontSize: 13,
-                  color: 'var(--ui-kit-color-content-fg)',
-                }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    padding: "2px 6px",
+                    background: "var(--ui-kit-color-ui-neutral-strong-bg)",
+                    border: "1px solid var(--ui-kit-color-ui-border)",
+                    borderRadius: 6,
+                    fontFamily:
+                      "var(--ui-kit-typography-font-family-monospace)",
+                    fontSize: 13,
+                    color: "var(--ui-kit-color-content-fg)",
+                  }}
+                >
                   {intl.formatMessage(messages.keyQ)}
                 </span>
-                <span style={{
-                  display: 'inline-flex',
-                  padding: '2px 6px',
-                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
-                  border: '1px solid var(--ui-kit-color-ui-border)',
-                  borderRadius: 6,
-                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
-                  fontSize: 13,
-                  color: 'var(--ui-kit-color-content-fg)',
-                }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    padding: "2px 6px",
+                    background: "var(--ui-kit-color-ui-neutral-strong-bg)",
+                    border: "1px solid var(--ui-kit-color-ui-border)",
+                    borderRadius: 6,
+                    fontFamily:
+                      "var(--ui-kit-typography-font-family-monospace)",
+                    fontSize: 13,
+                    color: "var(--ui-kit-color-content-fg)",
+                  }}
+                >
                   {intl.formatMessage(messages.keyA)}
                 </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  flexWrap: "wrap",
+                }}
+              >
                 <Text size="xsmall">
                   {intl.formatMessage(messages.shortcutRotateY)}
                 </Text>
-                <span style={{
-                  display: 'inline-flex',
-                  padding: '2px 6px',
-                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
-                  border: '1px solid var(--ui-kit-color-ui-border)',
-                  borderRadius: 6,
-                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
-                  fontSize: 13,
-                  color: 'var(--ui-kit-color-content-fg)',
-                }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    padding: "2px 6px",
+                    background: "var(--ui-kit-color-ui-neutral-strong-bg)",
+                    border: "1px solid var(--ui-kit-color-ui-border)",
+                    borderRadius: 6,
+                    fontFamily:
+                      "var(--ui-kit-typography-font-family-monospace)",
+                    fontSize: 13,
+                    color: "var(--ui-kit-color-content-fg)",
+                  }}
+                >
                   {intl.formatMessage(messages.keyW)}
                 </span>
-                <span style={{
-                  display: 'inline-flex',
-                  padding: '2px 6px',
-                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
-                  border: '1px solid var(--ui-kit-color-ui-border)',
-                  borderRadius: 6,
-                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
-                  fontSize: 13,
-                  color: 'var(--ui-kit-color-content-fg)',
-                }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    padding: "2px 6px",
+                    background: "var(--ui-kit-color-ui-neutral-strong-bg)",
+                    border: "1px solid var(--ui-kit-color-ui-border)",
+                    borderRadius: 6,
+                    fontFamily:
+                      "var(--ui-kit-typography-font-family-monospace)",
+                    fontSize: 13,
+                    color: "var(--ui-kit-color-content-fg)",
+                  }}
+                >
                   {intl.formatMessage(messages.keyS)}
                 </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  flexWrap: "wrap",
+                }}
+              >
                 <Text size="xsmall">
                   {intl.formatMessage(messages.shortcutRotateZ)}
                 </Text>
-                <span style={{
-                  display: 'inline-flex',
-                  padding: '2px 6px',
-                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
-                  border: '1px solid var(--ui-kit-color-ui-border)',
-                  borderRadius: 6,
-                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
-                  fontSize: 13,
-                  color: 'var(--ui-kit-color-content-fg)',
-                }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    padding: "2px 6px",
+                    background: "var(--ui-kit-color-ui-neutral-strong-bg)",
+                    border: "1px solid var(--ui-kit-color-ui-border)",
+                    borderRadius: 6,
+                    fontFamily:
+                      "var(--ui-kit-typography-font-family-monospace)",
+                    fontSize: 13,
+                    color: "var(--ui-kit-color-content-fg)",
+                  }}
+                >
                   {intl.formatMessage(messages.keyE)}
                 </span>
-                <span style={{
-                  display: 'inline-flex',
-                  padding: '2px 6px',
-                  background: 'var(--ui-kit-color-ui-neutral-strong-bg)',
-                  border: '1px solid var(--ui-kit-color-ui-border)',
-                  borderRadius: 6,
-                  fontFamily: 'var(--ui-kit-typography-font-family-monospace)',
-                  fontSize: 13,
-                  color: 'var(--ui-kit-color-content-fg)',
-                }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    padding: "2px 6px",
+                    background: "var(--ui-kit-color-ui-neutral-strong-bg)",
+                    border: "1px solid var(--ui-kit-color-ui-border)",
+                    borderRadius: 6,
+                    fontFamily:
+                      "var(--ui-kit-typography-font-family-monospace)",
+                    fontSize: 13,
+                    color: "var(--ui-kit-color-content-fg)",
+                  }}
+                >
                   {intl.formatMessage(messages.keyD)}
                 </span>
               </div>
@@ -993,7 +1372,6 @@ const App = () => {
             </Rows>
           </AccordionItem>
         </Accordion>
-
       </Rows>
     </div>
   );
