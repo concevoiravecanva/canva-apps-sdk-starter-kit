@@ -119,6 +119,10 @@ const ThreeScene: React.FC<ThreeSceneProps> = (props) => {
       if (sceneRef.current) {
         sceneRef.current.environment = texture;
       }
+      // Force a re-render after the environment map is set
+      if (rendererRef.current && sceneRef.current && cameraRef.current) {
+        rendererRef.current.render(sceneRef.current, cameraRef.current);
+      }
       onSceneReady();
     });
 
@@ -820,10 +824,10 @@ const App = () => {
               <Select
                 value={exportSize}
                 options={[
-                  { value: 512, label: "512px" },
-                  { value: 1024, label: "1024px" },
-                  { value: 2048, label: "2048px" },
-                  { value: 4096, label: "4096px" },
+                  { value: 512, label: intl.formatMessage({ defaultMessage: "512px", description: "Export size option 512px" }) },
+                  { value: 1024, label: intl.formatMessage({ defaultMessage: "1024px", description: "Export size option 1024px" }) },
+                  { value: 2048, label: intl.formatMessage({ defaultMessage: "2048px", description: "Export size option 2048px" }) },
+                  { value: 4096, label: intl.formatMessage({ defaultMessage: "4096px", description: "Export size option 4096px" }) },
                 ]}
                 onChange={(value) => setExportSize(value as number)}
               />
