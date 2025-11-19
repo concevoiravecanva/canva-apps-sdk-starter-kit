@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from 'three-stdlib';
-import { Rows, Text, Select, Button, ColorSelector, Box, Slider, Columns, Column, ChevronUpIcon, ChevronDownIcon } from "@canva/app-ui-kit";
+import { Rows, Text, Select, Button, ColorSelector, Box, Slider, Columns, Column, Accordion, AccordionItem } from "@canva/app-ui-kit";
 import { addElementAtPoint } from "@canva/design";
 import { useIntl } from "react-intl";
 import "styles/components.css";
@@ -10,35 +10,6 @@ import venice_sunset from 'assets/hdr/venice_sunset_1k.hdr';
 
 type Shape = "cube" | "sphere" | "cylinder" | "donut" | "cone" | "torusKnot" | "icosahedron" | "dodecahedron" | "vase";
 type MaterialType = "matte" | "metal" | "glass" | "velvet" | "toon" | "wireframe" | "plastic" | "porcelain" | "normal" | "lambert";
-
-interface CollapsibleSectionProps {
-  title: string;
-  children: React.ReactNode;
-  isOpenDefault?: boolean;
-}
-
-const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ title, children, isOpenDefault = false }) => {
-  const [isOpen, setIsOpen] = useState(isOpenDefault);
-
-  return (
-    <Rows spacing="1u">
-      <div className="sectionHeader" onClick={() => setIsOpen(!isOpen)}>
-        <Columns align="center" spacing="1u">
-            <Column>
-                <Text>{title}</Text>
-            </Column>
-            <Column>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
-                    {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-                </div>
-            </Column>
-        </Columns>
-      </div>
-      {isOpen && <Box className="sectionContent">{children}</Box>}
-    </Rows>
-  );
-};
-
 
 const App = () => {
   const intl = useIntl();
@@ -298,7 +269,7 @@ const App = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container" style={{ padding: '16px' }}>
       <Rows spacing="1u">
         <Box>
           <div ref={mountRef} className="renderPreview" />
@@ -308,162 +279,164 @@ const App = () => {
           {intl.formatMessage({ defaultMessage: "Add to Canva", description: "Button to add the 3D element to the Canva design" })}
         </Button>
 
-        <CollapsibleSection title={intl.formatMessage({ defaultMessage: "Object", description: "Title for the Object settings section"})} isOpenDefault={true}>
-          <Rows spacing="1.5u">
-            <Rows spacing="0.5u">
-              <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Shape", description: "Label for the shape selection dropdown" })}</Text>
-              <Select
-                value={shape}
-                options={[
-                  { value: "cube", label: intl.formatMessage({ defaultMessage: "Cube", description: "Cube shape option" }) },
-                  { value: "sphere", label: intl.formatMessage({ defaultMessage: "Sphere", description: "Sphere shape option" }) },
-                  { value: "cylinder", label: intl.formatMessage({ defaultMessage: "Cylinder", description: "Cylinder shape option" }) },
-                  { value: "donut", label: intl.formatMessage({ defaultMessage: "Donut", description: "Donut shape option" }) },
-                  { value: "cone", label: intl.formatMessage({ defaultMessage: "Cone", description: "Cone shape option" }) },
-                  { value: "torusKnot", label: intl.formatMessage({ defaultMessage: "Knot", description: "Torus Knot shape option" }) },
-                  { value: "icosahedron", label: intl.formatMessage({ defaultMessage: "Icosahedron", description: "Icosahedron shape option" }) },
-                  { value: "dodecahedron", label: intl.formatMessage({ defaultMessage: "Dodecahedron", description: "Dodecahedron shape option" }) },
-                  { value: "vase", label: intl.formatMessage({ defaultMessage: "Vase", description: "Vase shape option" }) },
-                ]}
-                onChange={(value) => setShape(value as Shape)}
-              />
+        <Accordion defaultExpanded>
+          <AccordionItem title={intl.formatMessage({ defaultMessage: "Object", description: "Title for the Object settings section"})}>
+            <Rows spacing="1.5u">
+              <Rows spacing="0.5u">
+                <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Shape", description: "Label for the shape selection dropdown" })}</Text>
+                <Select
+                  value={shape}
+                  options={[
+                    { value: "cube", label: intl.formatMessage({ defaultMessage: "Cube", description: "Cube shape option" }) },
+                    { value: "sphere", label: intl.formatMessage({ defaultMessage: "Sphere", description: "Sphere shape option" }) },
+                    { value: "cylinder", label: intl.formatMessage({ defaultMessage: "Cylinder", description: "Cylinder shape option" }) },
+                    { value: "donut", label: intl.formatMessage({ defaultMessage: "Donut", description: "Donut shape option" }) },
+                    { value: "cone", label: intl.formatMessage({ defaultMessage: "Cone", description: "Cone shape option" }) },
+                    { value: "torusKnot", label: intl.formatMessage({ defaultMessage: "Knot", description: "Torus Knot shape option" }) },
+                    { value: "icosahedron", label: intl.formatMessage({ defaultMessage: "Icosahedron", description: "Icosahedron shape option" }) },
+                    { value: "dodecahedron", label: intl.formatMessage({ defaultMessage: "Dodecahedron", description: "Dodecahedron shape option" }) },
+                    { value: "vase", label: intl.formatMessage({ defaultMessage: "Vase", description: "Vase shape option" }) },
+                  ]}
+                  onChange={(value) => setShape(value as Shape)}
+                />
+              </Rows>
+              <Rows spacing="0.5u">
+                <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Material", description: "Label for the material selection dropdown" })}</Text>
+                <Select
+                  value={materialType}
+                  options={[
+                    { value: "matte", label: intl.formatMessage({ defaultMessage: "Matte", description: "Matte material option" }) },
+                    { value: "plastic", label: intl.formatMessage({ defaultMessage: "Plastic", description: "Plastic material option" }) },
+                    { value: "metal", label: intl.formatMessage({ defaultMessage: "Metal", description: "Metal material option" }) },
+                    { value: "glass", label: intl.formatMessage({ defaultMessage: "Glass", description: "Glass material option" }) },
+                    { value: "porcelain", label: intl.formatMessage({ defaultMessage: "Porcelain", description: "Porcelain material option" }) },
+                    { value: "velvet", label: intl.formatMessage({ defaultMessage: "Velvet", description: "Velvet material option" }) },
+                    { value: "toon", label: intl.formatMessage({ defaultMessage: "Toon", description: "Toon material option" }) },
+                    { value: "lambert", label: intl.formatMessage({ defaultMessage: "Lambert", description: "Lambert material option" }) },
+                    { value: "normal", label: intl.formatMessage({ defaultMessage: "Normal", description: "Normal material option" }) },
+                    { value: "wireframe", label: intl.formatMessage({ defaultMessage: "Wireframe", description: "Wireframe material option" }) },
+                  ]}
+                  onChange={(value) => setMaterialType(value as MaterialType)}
+                />
+              </Rows>
             </Rows>
-            <Rows spacing="0.5u">
-              <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Material", description: "Label for the material selection dropdown" })}</Text>
-              <Select
-                value={materialType}
-                options={[
-                  { value: "matte", label: intl.formatMessage({ defaultMessage: "Matte", description: "Matte material option" }) },
-                  { value: "plastic", label: intl.formatMessage({ defaultMessage: "Plastic", description: "Plastic material option" }) },
-                  { value: "metal", label: intl.formatMessage({ defaultMessage: "Metal", description: "Metal material option" }) },
-                  { value: "glass", label: intl.formatMessage({ defaultMessage: "Glass", description: "Glass material option" }) },
-                  { value: "porcelain", label: intl.formatMessage({ defaultMessage: "Porcelain", description: "Porcelain material option" }) },
-                  { value: "velvet", label: intl.formatMessage({ defaultMessage: "Velvet", description: "Velvet material option" }) },
-                  { value: "toon", label: intl.formatMessage({ defaultMessage: "Toon", description: "Toon material option" }) },
-                  { value: "lambert", label: intl.formatMessage({ defaultMessage: "Lambert", description: "Lambert material option" }) },
-                  { value: "normal", label: intl.formatMessage({ defaultMessage: "Normal", description: "Normal material option" }) },
-                  { value: "wireframe", label: intl.formatMessage({ defaultMessage: "Wireframe", description: "Wireframe material option" }) },
-                ]}
-                onChange={(value) => setMaterialType(value as MaterialType)}
-              />
-            </Rows>
-          </Rows>
-        </CollapsibleSection>
+          </AccordionItem>
 
-        <CollapsibleSection title={intl.formatMessage({ defaultMessage: "Deformations", description: "Title for the Deformations settings section"})}>
-          <Rows spacing="1.5u">
-            <Box>
-              <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Twist: {twist}°", description: "Label for the twist slider" }, { twist })}</Text>
-              <Slider
-                value={twist}
-                min={-180}
-                max={180}
-                onChange={setTwist}
-              />
-            </Box>
-            <Box>
-              <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Taper: {taper}", description: "Label for the taper slider" }, { taper: taper.toFixed(2) })}</Text>
-              <Slider
-                value={taper}
-                min={-1}
-                max={1}
-                step={0.05}
-                onChange={setTaper}
-              />
-            </Box>
-            <Box>
-              <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Noise: {noise}", description: "Label for the noise slider" }, { noise: noise.toFixed(2) })}</Text>
-              <Slider
-                value={noise}
-                min={0}
-                max={1}
-                step={0.05}
-                onChange={setNoise}
-              />
-            </Box>
-            {shape === 'cube' && (
+          <AccordionItem title={intl.formatMessage({ defaultMessage: "Deformations", description: "Title for the Deformations settings section"})}>
+            <Rows spacing="1.5u">
               <Box>
-                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Roundness: {roundness}", description: "Label for the roundness slider" }, { roundness: roundness.toFixed(2) })}</Text>
+                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Twist: {twist}°", description: "Label for the twist slider" }, { twist })}</Text>
                 <Slider
-                  value={roundness}
+                  value={twist}
+                  min={-180}
+                  max={180}
+                  onChange={setTwist}
+                />
+              </Box>
+              <Box>
+                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Taper: {taper}", description: "Label for the taper slider" }, { taper: taper.toFixed(2) })}</Text>
+                <Slider
+                  value={taper}
+                  min={-1}
+                  max={1}
+                  step={0.05}
+                  onChange={setTaper}
+                />
+              </Box>
+              <Box>
+                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Noise: {noise}", description: "Label for the noise slider" }, { noise: noise.toFixed(2) })}</Text>
+                <Slider
+                  value={noise}
                   min={0}
                   max={1}
                   step={0.05}
-                  onChange={setRoundness}
+                  onChange={setNoise}
                 />
               </Box>
-            )}
-          </Rows>
-        </CollapsibleSection>
+              {shape === 'cube' && (
+                <Box>
+                  <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Roundness: {roundness}", description: "Label for the roundness slider" }, { roundness: roundness.toFixed(2) })}</Text>
+                  <Slider
+                    value={roundness}
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    onChange={setRoundness}
+                  />
+                </Box>
+              )}
+            </Rows>
+          </AccordionItem>
 
-        <CollapsibleSection title={intl.formatMessage({ defaultMessage: "Lighting & Colors", description: "Title for the Lighting & Colors settings section"})}>
-          <Rows spacing="1.5u">
-            <Columns spacing="1u" align="center">
-              <Column>
-                  <Rows spacing="0.5u">
-                      <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Main Color", description: "Label for the main color selector" })}</Text>
-                      <ColorSelector
-                          color={mainColor}
-                          onChange={setMainColor}
-                      />
-                  </Rows>
-              </Column>
-              <Column>
-                  <Rows spacing="0.5u">
-                      <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Shadow Tint", description: "Label for the shadow tint color selector" })}</Text>
-                      <ColorSelector
-                          color={shadowTint}
-                          onChange={setShadowTint}
-                      />
-                  </Rows>
-              </Column>
-              <Column>
-                  <Rows spacing="0.5u">
-                      <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Light Color", description: "Label for the light color selector" })}</Text>
-                      <ColorSelector
-                          color={lightColor}
-                          onChange={setLightColor}
-                      />
-                  </Rows>
-              </Column>
-            </Columns>
-            <Box>
-              <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Shadow Intensity: {shadowIntensity}", description: "Label for the shadow intensity slider" }, { shadowIntensity: shadowIntensity.toFixed(2) })}</Text>
-              <Slider
-                value={shadowIntensity}
-                min={0}
-                max={2}
-                step={0.1}
-                onChange={setShadowIntensity}
-              />
-            </Box>
-            <Box>
-              <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Ambient Intensity: {ambientIntensity}", description: "Label for the ambient intensity slider" }, { ambientIntensity: ambientIntensity.toFixed(2) })}</Text>
-              <Slider
-                value={ambientIntensity}
-                min={0}
-                max={2}
-                step={0.1}
-                onChange={setAmbientIntensity}
-              />
-            </Box>
-          </Rows>
-        </CollapsibleSection>
+          <AccordionItem title={intl.formatMessage({ defaultMessage: "Lighting & Colors", description: "Title for the Lighting & Colors settings section"})}>
+            <Rows spacing="1.5u">
+              <Columns spacing="1u" align="center">
+                <Column>
+                    <Rows spacing="0.5u">
+                        <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Main Color", description: "Label for the main color selector" })}</Text>
+                        <ColorSelector
+                            color={mainColor}
+                            onChange={setMainColor}
+                        />
+                    </Rows>
+                </Column>
+                <Column>
+                    <Rows spacing="0.5u">
+                        <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Shadow Tint", description: "Label for the shadow tint color selector" })}</Text>
+                        <ColorSelector
+                            color={shadowTint}
+                            onChange={setShadowTint}
+                        />
+                    </Rows>
+                </Column>
+                <Column>
+                    <Rows spacing="0.5u">
+                        <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Light Color", description: "Label for the light color selector" })}</Text>
+                        <ColorSelector
+                            color={lightColor}
+                            onChange={setLightColor}
+                        />
+                    </Rows>
+                </Column>
+              </Columns>
+              <Box>
+                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Shadow Intensity: {shadowIntensity}", description: "Label for the shadow intensity slider" }, { shadowIntensity: shadowIntensity.toFixed(2) })}</Text>
+                <Slider
+                  value={shadowIntensity}
+                  min={0}
+                  max={2}
+                  step={0.1}
+                  onChange={setShadowIntensity}
+                />
+              </Box>
+              <Box>
+                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Ambient Intensity: {ambientIntensity}", description: "Label for the ambient intensity slider" }, { ambientIntensity: ambientIntensity.toFixed(2) })}</Text>
+                <Slider
+                  value={ambientIntensity}
+                  min={0}
+                  max={2}
+                  step={0.1}
+                  onChange={setAmbientIntensity}
+                />
+              </Box>
+            </Rows>
+          </AccordionItem>
 
-        <CollapsibleSection title={intl.formatMessage({ defaultMessage: "Camera", description: "Title for the Camera settings section"})}>
-          <Rows spacing="1.5u">
-            <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Camera Angle", description: "Label for the camera angle selection dropdown" })}</Text>
-            <Select
-              value={angle}
-              options={[
-                { value: "isometric-left", label: intl.formatMessage({ defaultMessage: "Isometric Left", description: "Isometric Left camera angle" }) },
-                { value: "isometric-right", label: intl.formatMessage({ defaultMessage: "Isometric Right", description: "Isometric Right camera angle" }) },
-                { value: "top-down", label: intl.formatMessage({ defaultMessage: "Slightly Top-Down", description: "Slightly Top-Down camera angle" }) },
-              ]}
-              onChange={setAngle}
-            />
-          </Rows>
-        </CollapsibleSection>
+          <AccordionItem title={intl.formatMessage({ defaultMessage: "Camera", description: "Title for the Camera settings section"})}>
+            <Rows spacing="1.5u">
+              <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Camera Angle", description: "Label for the camera angle selection dropdown" })}</Text>
+              <Select
+                value={angle}
+                options={[
+                  { value: "isometric-left", label: intl.formatMessage({ defaultMessage: "Isometric Left", description: "Isometric Left camera angle" }) },
+                  { value: "isometric-right", label: intl.formatMessage({ defaultMessage: "Isometric Right", description: "Isometric Right camera angle" }) },
+                  { value: "top-down", label: intl.formatMessage({ defaultMessage: "Slightly Top-Down", description: "Slightly Top-Down camera angle" }) },
+                ]}
+                onChange={setAngle}
+              />
+            </Rows>
+          </AccordionItem>
+        </Accordion>
 
       </Rows>
     </div>
