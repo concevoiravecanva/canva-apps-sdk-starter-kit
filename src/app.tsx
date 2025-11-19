@@ -19,7 +19,6 @@ const defaultState = {
   roundness: 0.1,
   taper: 0,
   noise: 0,
-  angle: "isometric-left",
   rotationX: 0,
   rotationY: 0,
   rotationZ: 0,
@@ -48,7 +47,6 @@ const App = () => {
   const [roundness, setRoundness] = useState(defaultState.roundness);
   const [taper, setTaper] = useState(defaultState.taper);
   const [noise, setNoise] = useState(defaultState.noise);
-  const [angle, setAngle] = useState(defaultState.angle);
   const [rotationX, setRotationX] = useState(defaultState.rotationX);
   const [rotationY, setRotationY] = useState(defaultState.rotationY);
   const [rotationZ, setRotationZ] = useState(defaultState.rotationZ);
@@ -315,29 +313,11 @@ const App = () => {
     }
 
     // --- Camera ---
-    switch (angle) {
-      case "isometric-left":
-        camera.position.set(-3, 2, 3);
-        break;
-      case "isometric-right":
-        camera.position.set(3, 2, 3);
-        break;
-      case "front":
-        camera.position.set(0, 0, 4);
-        break;
-      case "top":
-        camera.position.set(0, 4, 0.01); // a little bit off to avoid gimbal lock
-        break;
-      case "side":
-        camera.position.set(4, 0, 0);
-        break;
-      default:
-        camera.position.set(-3, 2, 3);
-    }
+    camera.position.set(0, 1, 5);
     camera.lookAt(0, 0, 0);
 
     renderer.render(scene, camera);
-  }, [shape, twist, roundness, taper, noise, angle, rotationX, rotationY, rotationZ, mainColor, shadowTint, lightColor, lightX, lightY, lightZ, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent, backgroundColor, backgroundOpacity, wireframeOverlay]);
+  }, [shape, twist, roundness, taper, noise, rotationX, rotationY, rotationZ, mainColor, shadowTint, lightColor, lightX, lightY, lightZ, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent, backgroundColor, backgroundOpacity, wireframeOverlay]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -429,7 +409,6 @@ const App = () => {
     setRoundness(defaultState.roundness);
     setTaper(defaultState.taper);
     setNoise(defaultState.noise);
-    setAngle(defaultState.angle);
     setRotationX(defaultState.rotationX);
     setRotationY(defaultState.rotationY);
     setRotationZ(defaultState.rotationZ);
@@ -755,22 +734,6 @@ const App = () => {
             </Rows>
           </AccordionItem>
 
-          <AccordionItem title={intl.formatMessage({ defaultMessage: "Camera", description: "Title for the Camera settings section"})}>
-            <Rows spacing="1.5u">
-              <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Camera Angle", description: "Label for the camera angle selection dropdown" })}</Text>
-              <Select
-                value={angle}
-                options={[
-                  { value: "isometric-left", label: intl.formatMessage({ defaultMessage: "Isometric Left", description: "Isometric Left camera angle" }) },
-                  { value: "isometric-right", label: intl.formatMessage({ defaultMessage: "Isometric Right", description: "Isometric Right camera angle" }) },
-                  { value: "front", label: intl.formatMessage({ defaultMessage: "Front", description: "Front camera angle" }) },
-                  { value: "top", label: intl.formatMessage({ defaultMessage: "Top", description: "Top camera angle" }) },
-                  { value: "side", label: intl.formatMessage({ defaultMessage: "Side", description: "Side camera angle" }) },
-                ]}
-                onChange={setAngle}
-              />
-            </Rows>
-          </AccordionItem>
            <AccordionItem title={intl.formatMessage({ defaultMessage: "Export Settings", description: "Title for the Export Settings section"})}>
             <Rows spacing="1.5u">
               <Text size="small" tone="tertiary">{intl.formatMessage({ defaultMessage: "Export Size", description: "Label for the export size selection dropdown" })}</Text>
