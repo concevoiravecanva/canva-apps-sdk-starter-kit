@@ -18,6 +18,9 @@ const defaultState = {
   taper: 0,
   noise: 0,
   angle: "isometric-left",
+  rotationX: 0,
+  rotationY: 0,
+  rotationZ: 0,
   mainColor: "#4A90E2",
   shadowTint: "#1E3A5F",
   lightColor: "#FFFFFF",
@@ -54,6 +57,9 @@ const App = () => {
   const [taper, setTaper] = useState(defaultState.taper);
   const [noise, setNoise] = useState(defaultState.noise);
   const [angle, setAngle] = useState(defaultState.angle);
+  const [rotationX, setRotationX] = useState(defaultState.rotationX);
+  const [rotationY, setRotationY] = useState(defaultState.rotationY);
+  const [rotationZ, setRotationZ] = useState(defaultState.rotationZ);
   const [mainColor, setMainColor] = useState(defaultState.mainColor);
   const [shadowTint, setShadowTint] = useState(defaultState.shadowTint);
   const [lightColor, setLightColor] = useState(defaultState.lightColor);
@@ -199,6 +205,13 @@ const App = () => {
       const mesh = new THREE.Mesh(geometry, material);
       scene.add(mesh);
 
+      // Rotation
+      mesh.rotation.set(
+        THREE.MathUtils.degToRad(rotationX),
+        THREE.MathUtils.degToRad(rotationY),
+        THREE.MathUtils.degToRad(rotationZ)
+      );
+
       // Deformations
       geometry.computeBoundingBox();
       const bbox = geometry.boundingBox as THREE.Box3;
@@ -316,7 +329,7 @@ const App = () => {
     camera.lookAt(0, 0, 0);
 
     renderer.render(scene, camera);
-  }, [shape, twist, roundness, taper, noise, angle, mainColor, shadowTint, lightColor, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent, backgroundColor, backgroundOpacity, wireframeOverlay]);
+  }, [shape, twist, roundness, taper, noise, angle, rotationX, rotationY, rotationZ, mainColor, shadowTint, lightColor, shadowIntensity, ambientIntensity, materialType, donutTube, knotP, knotQ, isTransparent, backgroundColor, backgroundOpacity, wireframeOverlay]);
 
   const addToCanva = () => {
     const renderer = rendererRef.current;
@@ -364,6 +377,9 @@ const App = () => {
     setTaper(defaultState.taper);
     setNoise(defaultState.noise);
     setAngle(defaultState.angle);
+    setRotationX(defaultState.rotationX);
+    setRotationY(defaultState.rotationY);
+    setRotationZ(defaultState.rotationZ);
     setMainColor(defaultState.mainColor);
     setShadowTint(defaultState.shadowTint);
     setLightColor(defaultState.lightColor);
@@ -389,6 +405,9 @@ const App = () => {
         case "taper": setTaper(value as number); break;
         case "noise": setNoise(value as number); break;
         case "angle": setAngle(value as string); break;
+        case "rotationX": setRotationX(value as number); break;
+        case "rotationY": setRotationY(value as number); break;
+        case "rotationZ": setRotationZ(value as number); break;
         case "mainColor": setMainColor(value as string); break;
         case "shadowTint": setShadowTint(value as string); break;
         case "lightColor": setLightColor(value as string); break;
@@ -481,6 +500,38 @@ const App = () => {
                 checked={wireframeOverlay}
                 onChange={(_, checked) => setWireframeOverlay(checked)}
               />
+            </Rows>
+          </AccordionItem>
+
+          <AccordionItem title={intl.formatMessage({ defaultMessage: "Rotation", description: "Title for the Rotation settings section"})}>
+            <Rows spacing="1.5u">
+              <Box>
+                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "X-Axis Rotation: {rotationX}°", description: "Label for the X-axis rotation slider" }, { rotationX })}</Text>
+                <Slider
+                  value={rotationX}
+                  min={0}
+                  max={360}
+                  onChange={setRotationX}
+                />
+              </Box>
+              <Box>
+                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Y-Axis Rotation: {rotationY}°", description: "Label for the Y-axis rotation slider" }, { rotationY })}</Text>
+                <Slider
+                  value={rotationY}
+                  min={0}
+                  max={360}
+                  onChange={setRotationY}
+                />
+              </Box>
+              <Box>
+                <Text size="xsmall">{intl.formatMessage({ defaultMessage: "Z-Axis Rotation: {rotationZ}°", description: "Label for the Z-axis rotation slider" }, { rotationZ })}</Text>
+                <Slider
+                  value={rotationZ}
+                  min={0}
+                  max={360}
+                  onChange={setRotationZ}
+                />
+              </Box>
             </Rows>
           </AccordionItem>
 
