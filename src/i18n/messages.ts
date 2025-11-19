@@ -53,10 +53,6 @@ export const messages = defineMessages({
         defaultMessage: "Dodecahedron",
         description: "Dodecahedron shape option"
     },
-    vase: {
-        defaultMessage: "Vase",
-        description: "Vase shape option"
-    },
     capsule: {
         defaultMessage: "Capsule",
         description: "Capsule shape option"

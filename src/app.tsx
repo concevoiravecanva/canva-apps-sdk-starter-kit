@@ -9,7 +9,7 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import venice_sunset from 'assets/hdr/venice_sunset_1k.hdr';
 import { messages } from './i18n/messages';
 
-type Shape = "cube" | "sphere" | "cylinder" | "donut" | "cone" | "torusKnot" | "icosahedron" | "dodecahedron" | "vase" | "capsule" | "octahedron" | "tetrahedron";
+type Shape = "cube" | "sphere" | "cylinder" | "donut" | "cone" | "torusKnot" | "icosahedron" | "dodecahedron" | "capsule" | "octahedron" | "tetrahedron";
 type MaterialType = "matte" | "metal" | "glass" | "velvet" | "toon" | "wireframe" | "plastic" | "porcelain" | "normal" | "lambert";
 
 const defaultState = {
@@ -278,14 +278,6 @@ const ThreeScene: React.FC<ThreeSceneProps> = (props) => {
       case "dodecahedron":
         geometry = new THREE.DodecahedronGeometry(1.2, 0);
         break;
-      case "vase": {
-        const points: THREE.Vector2[] = [];
-        for (let i = 0; i < 10; i++) {
-          points.push(new THREE.Vector2(Math.sin(i * 0.2) * 1.5 + 0.5, (i - 5) * 0.4));
-        }
-        geometry = new THREE.LatheGeometry(points);
-        break;
-      }
       case "capsule":
         geometry = new THREE.CapsuleGeometry(1, 1, 4, 8);
         break;
@@ -366,7 +358,7 @@ const App = () => {
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
 
-  const shapes: Shape[] = ["cube", "sphere", "cylinder", "donut", "cone", "torusKnot", "icosahedron", "dodecahedron", "vase", "capsule", "octahedron", "tetrahedron"];
+  const shapes: Shape[] = ["cube", "sphere", "cylinder", "donut", "cone", "torusKnot", "icosahedron", "dodecahedron", "capsule", "octahedron", "tetrahedron"];
   const materials: MaterialType[] = ["matte", "plastic", "metal", "glass", "porcelain", "velvet", "toon", "lambert", "normal", "wireframe"];
 
   useEffect(() => {
@@ -557,7 +549,6 @@ const App = () => {
                     { value: "torusKnot", label: intl.formatMessage(messages.torusKnot) },
                     { value: "icosahedron", label: intl.formatMessage(messages.icosahedron) },
                     { value: "dodecahedron", label: intl.formatMessage(messages.dodecahedron) },
-                    { value: "vase", label: intl.formatMessage(messages.vase) },
                     { value: "capsule", label: intl.formatMessage(messages.capsule) },
                     { value: "octahedron", label: intl.formatMessage(messages.octahedron) },
                     { value: "tetrahedron", label: intl.formatMessage(messages.tetrahedron) },
