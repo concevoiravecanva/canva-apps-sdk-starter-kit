@@ -185,22 +185,6 @@ export const messages = defineMessages({
     defaultMessage: "Ambient Intensity: {ambientIntensity}",
     description: "Label for the ambient intensity slider",
   },
-  lightPosition: {
-    defaultMessage: "Light Position",
-    description: "Label for the light position sliders",
-  },
-  lightX: {
-    defaultMessage: "X: {lightX}",
-    description: "Label for the light X position slider",
-  },
-  lightY: {
-    defaultMessage: "Y: {lightY}",
-    description: "Label for the light Y position slider",
-  },
-  lightZ: {
-    defaultMessage: "Z: {lightZ}",
-    description: "Label for the light Z position slider",
-  },
   transparentBackground: {
     defaultMessage: "Transparent Background",
     description: "Checkbox to toggle transparent background",
@@ -401,18 +385,6 @@ export const messages = defineMessages({
   ambientIntensitySliderAriaLabel: {
     defaultMessage: "Adjust the intensity of the ambient light",
     description: "ARIA label for the ambient intensity slider",
-  },
-  lightXSliderAriaLabel: {
-    defaultMessage: "Adjust the X position of the light source",
-    description: "ARIA label for the light X position slider",
-  },
-  lightYSliderAriaLabel: {
-    defaultMessage: "Adjust the Y position of the light source",
-    description: "ARIA label for the light Y position slider",
-  },
-  lightZSliderAriaLabel: {
-    defaultMessage: "Adjust the Z position of the light source",
-    description: "ARIA label for the light Z position slider",
   },
   backgroundColorAriaLabel: {
     defaultMessage: "Select the background color",

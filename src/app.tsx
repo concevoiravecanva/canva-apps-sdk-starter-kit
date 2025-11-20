@@ -1046,55 +1046,6 @@ const App = () => {
                   onChange={setAmbientIntensity}
                 />
               </Box>
-              <Box>
-                <Text size="small" tone="tertiary">
-                  {intl.formatMessage(messages.lightPosition)}
-                </Text>
-                <Rows spacing="1u">
-                  <Box>
-                    <Text size="xsmall">
-                      {intl.formatMessage(messages.lightX, {
-                        lightX: lightX.toFixed(1),
-                      })}
-                    </Text>
-                    <Slider
-                      value={lightX}
-                      min={-20}
-                      max={20}
-                      step={0.5}
-                      onChange={setLightX}
-                    />
-                  </Box>
-                  <Box>
-                    <Text size="xsmall">
-                      {intl.formatMessage(messages.lightY, {
-                        lightY: lightY.toFixed(1),
-                      })}
-                    </Text>
-                    <Slider
-                      value={lightY}
-                      min={-20}
-                      max={20}
-                      step={0.5}
-                      onChange={setLightY}
-                    />
-                  </Box>
-                  <Box>
-                    <Text size="xsmall">
-                      {intl.formatMessage(messages.lightZ, {
-                        lightZ: lightZ.toFixed(1),
-                      })}
-                    </Text>
-                    <Slider
-                      value={lightZ}
-                      min={-20}
-                      max={20}
-                      step={0.5}
-                      onChange={setLightZ}
-                    />
-                  </Box>
-                </Rows>
-              </Box>
               <Checkbox
                 label={intl.formatMessage(messages.transparentBackground)}
                 checked={isTransparent}
