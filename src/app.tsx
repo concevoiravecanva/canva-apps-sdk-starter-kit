@@ -630,10 +630,7 @@ const App = () => {
       top: 100,
       left: 100,
       altText: {
-        text: intl.formatMessage({
-          defaultMessage: "A 3D-rendered object",
-          description: "Alt text for the exported image",
-        }),
+  text: intl.formatMessage(messages.exportedImageAltText),
         decorative: false,
       },
     });
