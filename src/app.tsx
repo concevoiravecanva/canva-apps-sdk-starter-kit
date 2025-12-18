@@ -667,7 +667,7 @@ const App = () => {
   };
 
   return (
-    <div className="container" style={{ padding: "16px" }}>
+    <Box padding="2u">
       <Rows spacing="1u">
         <Box>
           <ThreeScene
@@ -1354,7 +1354,7 @@ const App = () => {
           </AccordionItem>
         </Accordion>
       </Rows>
-    </div>
+    </Box>
   );
 };
 
