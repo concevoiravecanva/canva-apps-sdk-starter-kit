@@ -9,8 +9,7 @@ import {
   ColorSelector,
   Box,
   Slider,
-  Columns,
-  Column,
+  FormField,
   Accordion,
   AccordionItem,
   Checkbox,
@@ -704,32 +703,28 @@ const App = () => {
           />
         </Box>
 
-        <Columns spacing="1u">
-          <Column>
-            <Button
-              variant="primary"
-              onClick={addToCanva}
-              stretch
-              disabled={!isSceneReady}
-              loading={!isSceneReady}
-              ariaLabel={intl.formatMessage(messages.addToCanvaAriaLabel)}
-            >
-              {isSceneReady
-                ? intl.formatMessage(messages.addToCanva)
-                : intl.formatMessage(messages.loadingScene)}
-            </Button>
-          </Column>
-          <Column>
-            <Button
-              variant="secondary"
-              onClick={handleReset}
-              stretch
-              ariaLabel={intl.formatMessage(messages.resetAriaLabel)}
-            >
-              {intl.formatMessage(messages.reset)}
-            </Button>
-          </Column>
-        </Columns>
+        <Rows spacing="1u">
+          <Button
+            variant="primary"
+            onClick={addToCanva}
+            stretch
+            disabled={!isSceneReady}
+            loading={!isSceneReady}
+            ariaLabel={intl.formatMessage(messages.addToCanvaAriaLabel)}
+          >
+            {isSceneReady
+              ? intl.formatMessage(messages.addToCanva)
+              : intl.formatMessage(messages.loadingScene)}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={handleReset}
+            stretch
+            ariaLabel={intl.formatMessage(messages.resetAriaLabel)}
+          >
+            {intl.formatMessage(messages.reset)}
+          </Button>
+        </Rows>
 
         <Accordion>
           <AccordionItem
@@ -737,103 +732,114 @@ const App = () => {
             defaultExpanded
           >
             <Rows spacing="1.5u">
-              <Rows spacing="0.5u">
-                <Text size="small" tone="tertiary">
-                  {intl.formatMessage(messages.shape)}
-                </Text>
-                <Select
-                  value={shape}
-                  options={[
-                    { value: "cube", label: intl.formatMessage(messages.cube) },
-                    {
-                      value: "sphere",
-                      label: intl.formatMessage(messages.sphere),
-                    },
-                    {
-                      value: "cylinder",
-                      label: intl.formatMessage(messages.cylinder),
-                    },
-                    {
-                      value: "donut",
-                      label: intl.formatMessage(messages.donut),
-                    },
-                    { value: "cone", label: intl.formatMessage(messages.cone) },
-                    {
-                      value: "torusKnot",
-                      label: intl.formatMessage(messages.torusKnot),
-                    },
-                    {
-                      value: "icosahedron",
-                      label: intl.formatMessage(messages.icosahedron),
-                    },
-                    {
-                      value: "dodecahedron",
-                      label: intl.formatMessage(messages.dodecahedron),
-                    },
-                    {
-                      value: "capsule",
-                      label: intl.formatMessage(messages.capsule),
-                    },
-                    {
-                      value: "octahedron",
-                      label: intl.formatMessage(messages.octahedron),
-                    },
-                    {
-                      value: "tetrahedron",
-                      label: intl.formatMessage(messages.tetrahedron),
-                    },
-                  ]}
-                  onChange={(value) => setShape(value as Shape)}
-                />
-              </Rows>
-              <Rows spacing="0.5u">
-                <Text size="small" tone="tertiary">
-                  {intl.formatMessage(messages.material)}
-                </Text>
-                <Select
-                  value={materialType}
-                  options={[
-                    {
-                      value: "matte",
-                      label: intl.formatMessage(messages.matte),
-                    },
-                    {
-                      value: "plastic",
-                      label: intl.formatMessage(messages.plastic),
-                    },
-                    {
-                      value: "metal",
-                      label: intl.formatMessage(messages.metal),
-                    },
-                    {
-                      value: "glass",
-                      label: intl.formatMessage(messages.glass),
-                    },
-                    {
-                      value: "porcelain",
-                      label: intl.formatMessage(messages.porcelain),
-                    },
-                    {
-                      value: "velvet",
-                      label: intl.formatMessage(messages.velvet),
-                    },
-                    { value: "toon", label: intl.formatMessage(messages.toon) },
-                    {
-                      value: "lambert",
-                      label: intl.formatMessage(messages.lambert),
-                    },
-                    {
-                      value: "normal",
-                      label: intl.formatMessage(messages.normal),
-                    },
-                    {
-                      value: "wireframe",
-                      label: intl.formatMessage(messages.wireframe),
-                    },
-                  ]}
-                  onChange={(value) => setMaterialType(value as MaterialType)}
-                />
-              </Rows>
+              <FormField<Shape>
+                label={intl.formatMessage(messages.shape)}
+                value={shape}
+                control={(controlProps) => (
+                  <Select
+                    value={shape}
+                    options={[
+                      { value: "cube", label: intl.formatMessage(messages.cube) },
+                      {
+                        value: "sphere",
+                        label: intl.formatMessage(messages.sphere),
+                      },
+                      {
+                        value: "cylinder",
+                        label: intl.formatMessage(messages.cylinder),
+                      },
+                      {
+                        value: "donut",
+                        label: intl.formatMessage(messages.donut),
+                      },
+                      {
+                        value: "cone",
+                        label: intl.formatMessage(messages.cone),
+                      },
+                      {
+                        value: "torusKnot",
+                        label: intl.formatMessage(messages.torusKnot),
+                      },
+                      {
+                        value: "icosahedron",
+                        label: intl.formatMessage(messages.icosahedron),
+                      },
+                      {
+                        value: "dodecahedron",
+                        label: intl.formatMessage(messages.dodecahedron),
+                      },
+                      {
+                        value: "capsule",
+                        label: intl.formatMessage(messages.capsule),
+                      },
+                      {
+                        value: "octahedron",
+                        label: intl.formatMessage(messages.octahedron),
+                      },
+                      {
+                        value: "tetrahedron",
+                        label: intl.formatMessage(messages.tetrahedron),
+                      },
+                    ]}
+                    onChange={(value) => setShape(value as Shape)}
+                    {...controlProps}
+                  />
+                )}
+              />
+
+              <FormField<MaterialType>
+                label={intl.formatMessage(messages.material)}
+                value={materialType}
+                control={(controlProps) => (
+                  <Select
+                    value={materialType}
+                    options={[
+                      {
+                        value: "matte",
+                        label: intl.formatMessage(messages.matte),
+                      },
+                      {
+                        value: "plastic",
+                        label: intl.formatMessage(messages.plastic),
+                      },
+                      {
+                        value: "metal",
+                        label: intl.formatMessage(messages.metal),
+                      },
+                      {
+                        value: "glass",
+                        label: intl.formatMessage(messages.glass),
+                      },
+                      {
+                        value: "porcelain",
+                        label: intl.formatMessage(messages.porcelain),
+                      },
+                      {
+                        value: "velvet",
+                        label: intl.formatMessage(messages.velvet),
+                      },
+                      {
+                        value: "toon",
+                        label: intl.formatMessage(messages.toon),
+                      },
+                      {
+                        value: "lambert",
+                        label: intl.formatMessage(messages.lambert),
+                      },
+                      {
+                        value: "normal",
+                        label: intl.formatMessage(messages.normal),
+                      },
+                      {
+                        value: "wireframe",
+                        label: intl.formatMessage(messages.wireframe),
+                      },
+                    ]}
+                    onChange={(value) => setMaterialType(value as MaterialType)}
+                    {...controlProps}
+                  />
+                )}
+              />
               <Checkbox
                 label={intl.formatMessage(messages.wireframeOverlay)}
                 checked={wireframeOverlay}
@@ -844,141 +850,161 @@ const App = () => {
 
           <AccordionItem title={intl.formatMessage(messages.rotation)}>
             <Rows spacing="1.5u">
-              <Box>
-                <Text size="xsmall">
-                  {intl.formatMessage(messages.rotationX, { rotationX })}
-                </Text>
-                <Slider
-                  value={rotationX}
-                  min={0}
-                  max={360}
-                  onChange={setRotationX}
-                />
-              </Box>
-              <Box>
-                <Text size="xsmall">
-                  {intl.formatMessage(messages.rotationY, { rotationY })}
-                </Text>
-                <Slider
-                  value={rotationY}
-                  min={0}
-                  max={360}
-                  onChange={setRotationY}
-                />
-              </Box>
-              <Box>
-                <Text size="xsmall">
-                  {intl.formatMessage(messages.rotationZ, { rotationZ })}
-                </Text>
-                <Slider
-                  value={rotationZ}
-                  min={0}
-                  max={360}
-                  onChange={setRotationZ}
-                />
-              </Box>
+              <FormField<number>
+                label={intl.formatMessage(messages.rotationX, { rotationX })}
+                value={rotationX}
+                control={(controlProps) => (
+                  <Slider
+                    value={rotationX}
+                    min={0}
+                    max={360}
+                    onChange={setRotationX}
+                    {...controlProps}
+                  />
+                )}
+              />
+              <FormField<number>
+                label={intl.formatMessage(messages.rotationY, { rotationY })}
+                value={rotationY}
+                control={(controlProps) => (
+                  <Slider
+                    value={rotationY}
+                    min={0}
+                    max={360}
+                    onChange={setRotationY}
+                    {...controlProps}
+                  />
+                )}
+              />
+              <FormField<number>
+                label={intl.formatMessage(messages.rotationZ, { rotationZ })}
+                value={rotationZ}
+                control={(controlProps) => (
+                  <Slider
+                    value={rotationZ}
+                    min={0}
+                    max={360}
+                    onChange={setRotationZ}
+                    {...controlProps}
+                  />
+                )}
+              />
             </Rows>
           </AccordionItem>
 
           <AccordionItem title={intl.formatMessage(messages.deformations)}>
             <Rows spacing="1.5u">
-              <Box>
-                <Text size="xsmall">
-                  {intl.formatMessage(messages.twist, { twist })}
-                </Text>
-                <Slider
-                  value={twist}
-                  min={-180}
-                  max={180}
-                  onChange={setTwist}
-                />
-              </Box>
-              <Box>
-                <Text size="xsmall">
-                  {intl.formatMessage(messages.taper, {
-                    taper: taper.toFixed(2),
-                  })}
-                </Text>
-                <Slider
-                  value={taper}
-                  min={-1}
-                  max={1}
-                  step={0.05}
-                  onChange={setTaper}
-                />
-              </Box>
-              <Box>
-                <Text size="xsmall">
-                  {intl.formatMessage(messages.noise, {
-                    noise: noise.toFixed(2),
-                  })}
-                </Text>
-                <Slider
-                  value={noise}
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  onChange={setNoise}
-                />
-              </Box>
-              {shape === "cube" && (
-                <Box>
-                  <Text size="xsmall">
-                    {intl.formatMessage(messages.roundness, {
-                      roundness: roundness.toFixed(2),
-                    })}
-                  </Text>
+              <FormField<number>
+                label={intl.formatMessage(messages.twist, { twist })}
+                value={twist}
+                control={(controlProps) => (
                   <Slider
-                    value={roundness}
+                    value={twist}
+                    min={-180}
+                    max={180}
+                    onChange={setTwist}
+                    {...controlProps}
+                  />
+                )}
+              />
+              <FormField<number>
+                label={intl.formatMessage(messages.taper, {
+                  taper: taper.toFixed(2),
+                })}
+                value={taper}
+                control={(controlProps) => (
+                  <Slider
+                    value={taper}
+                    min={-1}
+                    max={1}
+                    step={0.05}
+                    onChange={setTaper}
+                    {...controlProps}
+                  />
+                )}
+              />
+              <FormField<number>
+                label={intl.formatMessage(messages.noise, {
+                  noise: noise.toFixed(2),
+                })}
+                value={noise}
+                control={(controlProps) => (
+                  <Slider
+                    value={noise}
                     min={0}
                     max={1}
                     step={0.05}
-                    onChange={setRoundness}
+                    onChange={setNoise}
+                    {...controlProps}
                   />
-                </Box>
+                )}
+              />
+              {shape === "cube" && (
+                <FormField<number>
+                  label={intl.formatMessage(messages.roundness, {
+                    roundness: roundness.toFixed(2),
+                  })}
+                  value={roundness}
+                  control={(controlProps) => (
+                    <Slider
+                      value={roundness}
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      onChange={setRoundness}
+                      {...controlProps}
+                    />
+                  )}
+                />
               )}
               {shape === "donut" && (
-                <Box>
-                  <Text size="xsmall">
-                    {intl.formatMessage(messages.donutTube, {
-                      donutTube: donutTube.toFixed(2),
-                    })}
-                  </Text>
-                  <Slider
-                    value={donutTube}
-                    min={0.1}
-                    max={0.8}
-                    step={0.05}
-                    onChange={setDonutTube}
-                  />
-                </Box>
+                <FormField<number>
+                  label={intl.formatMessage(messages.donutTube, {
+                    donutTube: donutTube.toFixed(2),
+                  })}
+                  value={donutTube}
+                  control={(controlProps) => (
+                    <Slider
+                      value={donutTube}
+                      min={0.1}
+                      max={0.8}
+                      step={0.05}
+                      onChange={setDonutTube}
+                      {...controlProps}
+                    />
+                  )}
+                />
               )}
               {shape === "torusKnot" && (
                 <>
-                  <Box>
-                    <Text size="xsmall">
-                      {intl.formatMessage(messages.knotP, { knotP })}
-                    </Text>
-                    <Slider
-                      value={knotP}
-                      min={1}
-                      max={10}
-                      step={1}
-                      onChange={setKnotP}
-                    />
-                  </Box>
-                  <Box>
-                    <Text size="xsmall">
-                      {intl.formatMessage(messages.knotQ, { knotQ })}
-                    </Text>
-                    <Slider
-                      value={knotQ}
-                      min={1}
-                      max={10}
-                      step={1}
-                      onChange={setKnotQ}
-                    />
-                  </Box>
+                  <FormField<number>
+                    label={intl.formatMessage(messages.knotP, { knotP })}
+                    value={knotP}
+                    control={(controlProps) => (
+                      <Slider
+                        value={knotP}
+                        min={1}
+                        max={10}
+                        step={1}
+                        onChange={setKnotP}
+                        {...controlProps}
+                      />
+                    )}
+                  />
+                  <FormField<number>
+                    label={intl.formatMessage(messages.knotQ, { knotQ })}
+                    value={knotQ}
+                    control={(controlProps) => (
+                      <Slider
+                        value={knotQ}
+                        min={1}
+                        max={10}
+                        step={1}
+                        onChange={setKnotQ}
+                        {...controlProps}
+                      />
+                    )}
+                  />
                 </>
               )}
             </Rows>
@@ -986,66 +1012,52 @@ const App = () => {
 
           <AccordionItem title={intl.formatMessage(messages.lightingColors)}>
             <Rows spacing="1.5u">
-              <Columns spacing="1u" align="center">
-                <Column>
-                  <Rows spacing="0.5u">
-                    <Text size="xsmall">
-                      {intl.formatMessage(messages.mainColor)}
-                    </Text>
-                    <ColorSelector color={mainColor} onChange={setMainColor} />
-                  </Rows>
-                </Column>
-                <Column>
-                  <Rows spacing="0.5u">
-                    <Text size="xsmall">
-                      {intl.formatMessage(messages.shadowTint)}
-                    </Text>
-                    <ColorSelector
-                      color={shadowTint}
-                      onChange={setShadowTint}
-                    />
-                  </Rows>
-                </Column>
-                <Column>
-                  <Rows spacing="0.5u">
-                    <Text size="xsmall">
-                      {intl.formatMessage(messages.lightColor)}
-                    </Text>
-                    <ColorSelector
-                      color={lightColor}
-                      onChange={setLightColor}
-                    />
-                  </Rows>
-                </Column>
-              </Columns>
-              <Box>
-                <Text size="xsmall">
-                  {intl.formatMessage(messages.shadowIntensity, {
-                    shadowIntensity: shadowIntensity.toFixed(2),
-                  })}
-                </Text>
-                <Slider
-                  value={shadowIntensity}
-                  min={0}
-                  max={2}
-                  step={0.1}
-                  onChange={setShadowIntensity}
-                />
-              </Box>
-              <Box>
-                <Text size="xsmall">
-                  {intl.formatMessage(messages.ambientIntensity, {
-                    ambientIntensity: ambientIntensity.toFixed(2),
-                  })}
-                </Text>
-                <Slider
-                  value={ambientIntensity}
-                  min={0}
-                  max={2}
-                  step={0.1}
-                  onChange={setAmbientIntensity}
-                />
-              </Box>
+              <Rows spacing="1u">
+                <Rows spacing="0.5u">
+                  <Text size="xsmall">{intl.formatMessage(messages.mainColor)}</Text>
+                  <ColorSelector color={mainColor} onChange={setMainColor} />
+                </Rows>
+                <Rows spacing="0.5u">
+                  <Text size="xsmall">{intl.formatMessage(messages.shadowTint)}</Text>
+                  <ColorSelector color={shadowTint} onChange={setShadowTint} />
+                </Rows>
+                <Rows spacing="0.5u">
+                  <Text size="xsmall">{intl.formatMessage(messages.lightColor)}</Text>
+                  <ColorSelector color={lightColor} onChange={setLightColor} />
+                </Rows>
+              </Rows>
+              <FormField<number>
+                label={intl.formatMessage(messages.shadowIntensity, {
+                  shadowIntensity: shadowIntensity.toFixed(2),
+                })}
+                value={shadowIntensity}
+                control={(controlProps) => (
+                  <Slider
+                    value={shadowIntensity}
+                    min={0}
+                    max={2}
+                    step={0.1}
+                    onChange={setShadowIntensity}
+                    {...controlProps}
+                  />
+                )}
+              />
+              <FormField<number>
+                label={intl.formatMessage(messages.ambientIntensity, {
+                  ambientIntensity: ambientIntensity.toFixed(2),
+                })}
+                value={ambientIntensity}
+                control={(controlProps) => (
+                  <Slider
+                    value={ambientIntensity}
+                    min={0}
+                    max={2}
+                    step={0.1}
+                    onChange={setAmbientIntensity}
+                    {...controlProps}
+                  />
+                )}
+              />
               <Checkbox
                 label={intl.formatMessage(messages.transparentBackground)}
                 checked={isTransparent}
@@ -1062,20 +1074,22 @@ const App = () => {
                       onChange={setBackgroundColor}
                     />
                   </Rows>
-                  <Box>
-                    <Text size="xsmall">
-                      {intl.formatMessage(messages.backgroundOpacity, {
-                        opacity: Math.round(backgroundOpacity * 100),
-                      })}
-                    </Text>
-                    <Slider
-                      value={backgroundOpacity}
-                      min={0}
-                      max={1}
-                      step={0.01}
-                      onChange={setBackgroundOpacity}
-                    />
-                  </Box>
+                  <FormField<number>
+                    label={intl.formatMessage(messages.backgroundOpacity, {
+                      opacity: Math.round(backgroundOpacity * 100),
+                    })}
+                    value={backgroundOpacity}
+                    control={(controlProps) => (
+                      <Slider
+                        value={backgroundOpacity}
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        onChange={setBackgroundOpacity}
+                        {...controlProps}
+                      />
+                    )}
+                  />
                 </Rows>
               )}
             </Rows>
@@ -1083,18 +1097,34 @@ const App = () => {
 
           <AccordionItem title={intl.formatMessage(messages.exportSettings)}>
             <Rows spacing="1.5u">
-              <Text size="small" tone="tertiary">
-                {intl.formatMessage(messages.exportSize)}
-              </Text>
-              <Select
+              <FormField<number>
+                label={intl.formatMessage(messages.exportSize)}
                 value={exportSize}
-                options={[
-                  { value: 512, label: intl.formatMessage(messages.size512) },
-                  { value: 1024, label: intl.formatMessage(messages.size1024) },
-                  { value: 2048, label: intl.formatMessage(messages.size2048) },
-                  { value: 4096, label: intl.formatMessage(messages.size4096) },
-                ]}
-                onChange={(value) => setExportSize(value as number)}
+                control={(controlProps) => (
+                  <Select
+                    value={exportSize}
+                    options={[
+                      {
+                        value: 512,
+                        label: intl.formatMessage(messages.size512),
+                      },
+                      {
+                        value: 1024,
+                        label: intl.formatMessage(messages.size1024),
+                      },
+                      {
+                        value: 2048,
+                        label: intl.formatMessage(messages.size2048),
+                      },
+                      {
+                        value: 4096,
+                        label: intl.formatMessage(messages.size4096),
+                      },
+                    ]}
+                    onChange={(value) => setExportSize(value as number)}
+                    {...controlProps}
+                  />
+                )}
               />
             </Rows>
           </AccordionItem>
