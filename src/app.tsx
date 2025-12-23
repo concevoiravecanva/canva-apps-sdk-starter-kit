@@ -666,7 +666,7 @@ const App = () => {
   return (
     <Box padding="2u">
       <Rows spacing="1u">
-        <Box>
+  <Box display="flex" justifyContent="center">
           <ThreeScene
             shape={shape}
             twist={twist}
@@ -735,6 +735,7 @@ const App = () => {
                 control={(controlProps) => (
                   <Select
                     value={shape}
+                    stretch
                     options={[
                       { value: "cube", label: intl.formatMessage(messages.cube) },
                       {
@@ -790,6 +791,7 @@ const App = () => {
                 control={(controlProps) => (
                   <Select
                     value={materialType}
+                    stretch
                     options={[
                       {
                         value: "matte",
@@ -1100,6 +1102,7 @@ const App = () => {
                 control={(controlProps) => (
                   <Select
                     value={exportSize}
+                    stretch
                     options={[
                       {
                         value: 512,

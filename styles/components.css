@@ -1,6 +1,7 @@
 .renderPreview {
-  width: 328px;
-  height: 328px;
+  width: 100%;
+  max-width: 328px;
+  aspect-ratio: 1 / 1;
   border: 1px solid var(--ui-kit-color-border);
   border-radius: 8px;
   background: 
